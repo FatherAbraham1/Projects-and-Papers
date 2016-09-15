@@ -1,0 +1,889 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:fb="http://ogp.me/ns/fb#" xmlns:og="http://ogp.me/ns#" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb" dir="ltr" >
+<head>
+<base href="http://www.firewall.cx/general-topics-reviews/free-security-services/135-tcp-header-analysis.html" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="robots" content="index, follow" />
+<meta name="keywords" content="tcp, header, length, ip, interger, bytes, options" />
+<meta name="title" content="TCP Header Length Analysis - Section 3" />
+<meta name="author" content="Administrator" />
+<meta name="description" content="This article covers the TCP Header length. We also examine how the header length is calculated." />
+<title>TCP Header Length Analysis - Section 3</title>
+<link href="/templates/yoo_ambient/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+<link rel="stylesheet" href="/cache/assets/55e3ca1c08c29f0cb05f6cf184bd7441.css" type="text/css" />
+<link rel="stylesheet" href="/templates/yoo_ambient/css/template.css.php?color=default&amp;styleswitcherFont=0&amp;styleswitcherWidth=0&amp;widthThinPx=790&amp;widthWidePx=1260&amp;widthFluidPx=0.9" type="text/css" />
+<link rel="stylesheet" href="http://www.firewall.cx/modules/mod_yoo_login/mod_yoo_login.css.php" type="text/css" />
+<style type="text/css">
+<!--
+a.cefeedback{right:0;background:url("http://www.firewall.cx/plugins/system/cefeedback/feedback-green-dark.png") no-repeat scroll 0 50% transparent !important;outline:medium none;padding:0 !important;position:fixed;text-indent:-9999px;top:45%;width:26px;height:100px;}a.cefeedback:hover,a.cefeedback:focus,a.cefeedback:active{background:url("http://www.firewall.cx/plugins/system/cefeedback/feedback-green-olive.png") no-repeat scroll 0 50% transparent !important;}div.linkr-rl {
+margin-top:20px;
+padding:10px 5px 0 5px;
+border-top:1px dotted #ccc;
+}
+div.linkr-rl div.linkr-rl-t {
+font-size:1.1em;
+letter-spacing:2px;
+text-transform:uppercase;
+}
+div.linkr-rl ul {
+list-style-type:square;
+line-height:1.5em;
+text-indent:5px;
+}
+div.linkr-rl ul li {
+padding:0 5px;
+background:none;
+}
+.yos_article_5063081d7ed00-tip {
+color: #000;
+width: 250px;
+z-index: 13000;
+}
+.yos_article_5063081d7ed00-title {
+font-weight: bold;
+font-size: 11px;
+margin: 0;
+color: #3E4F14;
+padding: 8px 8px 4px;
+background: #C3DF7D;
+border-bottom: 1px solid #B5CF74;
+-moz-border-radius-topleft: 5px;
+-moz-border-radius-topright: 5px;
+}
+.yos_article_5063081d7ed00-text {
+font-size: 11px;
+padding: 4px 8px 8px;
+background: #CFDFA7;
+-moz-border-radius-bottomleft: 5px;
+-moz-border-radius-bottomright: 5px;
+}
+.yos_article_5063081e902f2-tip {
+color: #000;
+width: 250px;
+z-index: 13000;
+}
+.yos_article_5063081e902f2-title {
+font-weight: bold;
+font-size: 11px;
+margin: 0;
+color: #3E4F14;
+padding: 8px 8px 4px;
+background: #C3DF7D;
+border-bottom: 1px solid #B5CF74;
+-moz-border-radius-topleft: 5px;
+-moz-border-radius-topright: 5px;
+}
+.yos_article_5063081e902f2-text {
+font-size: 11px;
+padding: 4px 8px 8px;
+background: #CFDFA7;
+-moz-border-radius-bottomleft: 5px;
+-moz-border-radius-bottomright: 5px;
+}
+-->
+</style>
+<script type="text/javascript" src="/plugins/system/mtupgrade/mootools.js"></script>
+<script type="text/javascript" src="/media/system/js/modal.js"></script>
+<script type="text/javascript" src="/media/system/js/caption.js"></script>
+<script type="text/javascript" src="/plugins/content/highslide/highslide-full.packed.js"></script>
+<script type="text/javascript" src="/plugins/content/highslide/easing_equations.js"></script>
+<script type="text/javascript" src="/plugins/content/highslide/swfobject.js"></script>
+<script type="text/javascript" src="/plugins/content/highslide/language/en.js"></script>
+<script type="text/javascript" src="/plugins/content/highslide/config/js/highslide-sitesettings.js"></script>
+<script type="text/javascript" src="/components/com_jfbconnect/includes/jfbconnect.js?v412"></script>
+<script type="text/javascript">
+window.addEvent('domready',function(){var ceFeedbackHover=new Asset.image('http://www.firewall.cx/plugins/system/cefeedback/feedback-green-olive.png');});window.addEvent("domready", function() {
+SqueezeBox.initialize({});
+$$("a.modal").each(function(el) {
+el.addEvent("click", function(e) {
+new Event(e).stop();
+SqueezeBox.fromElement(el);
+});
+});
+});hs.graphicsDir = '/plugins/content/highslide/graphics/';var YtSettings = { tplurl: '/templates/yoo_ambient', color: 'default', layout: 'left', fontDefault: 'font-medium', widthDefault: 'width-wide', widthThinPx: 790, widthWidePx: 1260, widthFluidPx: 0.9 };window.addEvent("domready", function() {
+var JTooltips = new Tips($$(".hasTip"), { maxTitleChars: 50, fixed: false});
+});
+</script>
+<script type="text/javascript">
+window.addEvent('domready', function(){
+var ji_vp = new VotitalyPlugin({
+submiturl: 'http://www.firewall.cx/plugins/content/ji_votitaly_ajax.php',
+loadingimg: 'http://www.firewall.cx/plugins/content/ji_votitaly/images/loading.gif',
+show_stars: true,
+star_description: '({num_votes} #LANG_VOTES, #LANG_AVERAGE {num_average} #LANG_OUTOF)',
+language: {
+updating: 'Updating...',
+thanks: 'Thanks for voting!',
+already_vote: 'You have already voted for this item!',
+votes: 'votes',
+vote: 'vote',
+average: 'average',
+outof: 'out of 5',
+error1: 'An error occured submitting your request!',
+error2: 'You have already voted for this item!',
+error3: 'Rating out of range!',
+error4: 'You have to login to rate this content!',
+error5: 'User rating already submitted for this item!'
+}
+});
+});
+</script>
+<script type="text/javascript" src="http://www.firewall.cx/plugins/content/ji_votitaly/js/votitalyplugin.js"></script>
+<script type="text/javascript">var YOOeffects = { url: 'http://www.firewall.cx/plugins/system/yoo_effects/lightbox/' };</script>
+<script type="text/javascript" src="http://www.firewall.cx/plugins/system/yoo_effects/yoo_effects.js.php?lb=1&amp;re=2&amp;sl=1"></script>
+<script type="text/javascript">var jfbcLogoutFacebook = false;
+var jfbcBase = 'http://www.firewall.cx/';
+var jfbcReturnUrl = 'L2dlbmVyYWwtdG9waWNzLXJldmlld3MvZnJlZS1zZWN1cml0eS1zZXJ2aWNlcy8xMzUtdGNwLWhlYWRlci1hbmFseXNpcy5odG1s';
+var jfbcRequiredPermissions = 'email';
+</script>
+<meta property="og:image" content="http://s7.addthis.com/static/btn/v2/lg-share-en.gif"/><meta property="og:url" content="http://www.firewall.cx/general-topics-reviews/free-security-services/135-tcp-header-analysis.html"/><meta property="og:title" content="TCP Header Length Analysis - Section 3"/><meta property="og:description" content="This article covers the TCP Header length. We also examine how the header length is calculated."/><meta property="og:type" content="article" /><meta property="fb:app_id" content="184508111659889"/><meta property="og:locale" content="en_GB" />
+<script src="http://platform.twitter.com/widgets.js"></script>
+<script src="http://apis.google.com/js/plusone.js"></script>
+<script src="http://platform.linkedin.com/in.js"></script>
+<script type="text/javascript" src="/templates/yoo_ambient/lib/js/template.js.php"></script>
+<link rel="apple-touch-icon" href="/templates/yoo_ambient/apple_touch_icon.png" />
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-1610883-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+})();
+</script></head>
+<body id="page" class="yoopage font-medium width-wide left   yootools-black"><div id="fb-root"></div>
+<script type="text/javascript">
+window.fbAsyncInit = function() {
+FB.init({appId: '184508111659889', status: true, cookie: true, xfbml: true, oauth: true, channelUrl: 'http://www.firewall.cx/components/com_jfbconnect/assets/jfbcchannel.php'});
+FB.Event.subscribe('comment.create', jfbc.social.comment.create);
+jfbc.social.googleAnalytics.trackFacebook();
+};
+(function(d){
+var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}
+js = d.createElement('script'); js.id = id; js.async = true;
+js.src = "//connect.facebook.net/en_GB/all.js";
+d.getElementsByTagName('head')[0].appendChild(js);
+}(document));
+</script>
+<div id="page-body">
+<div class="wrapper floatholder">
+<div class="wrapper-t">
+<div class="wrapper-b">
+<div class="wrapper-l">
+<div class="wrapper-r">
+<div class="wrapper-tl">
+<div class="wrapper-tr">
+<div class="wrapper-bl">
+<div class="wrapper-br">
+<div id="header">
+<div id="toolbar">
+<div class="floatbox ie_fix_floats">
+<div id="date">
+Wednesday, 26 September 2012</div>
+<div id="topmenu">
+<ul class="menu"><li class="level1 item2 first"><a href="/meet-the-team.html" class="level1 item2 first"><span>Meet The Team!</span></a></li><li class="level1 item3"><a href="/free-cisco-lab.html" class="level1 item3"><span>Free Cisco Lab</span></a></li><li class="level1 item4"><a href="/news.html" class="level1 item4"><span>News</span></a></li><li class="level1 item5"><a href="/site-map.html" class="level1 item5"><span>Site Map - Alternative Menu</span></a></li><li class="level1 item6 last"><a href="/recommended-websites.html" class="level1 item6 last"><span>Recommended Websites</span></a></li></ul>
+</div>
+</div>
+</div>
+<div id="headerbar">
+<div class="floatbox ie_fix_floats">
+<div id="headermodule">
+<div class="module">
+<div>
+<div>
+<div>
+<form action="/general-topics-reviews/free-security-services.html" method="post" name="login">
+<span class="quick" style="display: block;">
+<span class="yoo-login">
+<span class="login">
+<span class="username">
+<input type="text" name="username" size="18" value="Username" onblur="if(this.value=='') this.value='Username';" onfocus="if(this.value=='Username') this.value='';" />
+</span>
+<span class="password">
+<input type="password" name="passwd" size="10" value="Password" onblur="if(this.value=='') this.value='Password';" onfocus="if(this.value=='Password') this.value='';" />
+</span>
+<input type="hidden" name="remember" value="yes" />
+<span class="login-button-icon">
+<button value="" name="Submit" type="submit" title="Login"></button>
+</span>
+<span class="lostpassword">
+<a href="/component/user/reset.html" title="Forgot your password?"></a>
+</span>
+<span class="lostusername">
+<a href="/component/user/remind.html" title="Forgot your username?"></a>
+</span>
+<span class="registration">
+<a href="/component/user/register.html" title="Create an account"></a>
+</span>
+<input type="hidden" name="option" value="com_user" />
+<input type="hidden" name="task" value="login" />
+<input type="hidden" name="return" value="" />
+<input type="hidden" name="50900ed3a1d557b6cb2e257bf3131d67" value="1" />
+</span>
+</span>
+</span>
+</form></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="logo">
+<a href="http://www.firewall.cx"><img style="float: left;" src="/images/stories/header/header-transperant.png" alt="header-transperant" width="293" height="85" /></a>                                                                            <br />                                                        <a href="/site-news/316-firewall-ciscopress.html"><img src="/images/stories/header/ciscopress-header.gif" alt="ciscopress-header" width="60" height="60" /></a>  <br />
+</div>
+<div id="search">
+<form action="index.php" method="post">
+<div id="yoo-search">
+<input name="searchword" maxlength="20" alt="Search" type="text" size="20" value="search..."  onblur="if(this.value=='') this.value='search...';" onfocus="if(this.value=='search...') this.value='';" />
+<button value="Search" name="Submit" type="submit">Search</button>
+</div>
+<input type="hidden" name="task"   value="search" />
+<input type="hidden" name="option" value="com_search" />
+</form>
+</div>
+<div id="menu">
+<div class="menu-l">
+<div class="menu-r">
+<ul class="menu"><li class="level1 item3 first"><a href="http://www.firewall.cx/" class="level1 item3 first"><span>Home</span></a></li><li class="level1 item5 parent"><a href="/networking-topics.html" class="level1 item5 parent"><span>Networking Topics</span></a><ul class="level2"><li class="level2 item1 first"><a href="/networking-topics/general-networking.html" class="level2 item1 first"><span>General Networking</span></a></li><li class="level2 item2"><a href="/networking-topics/cabling-utp-fibre.html" class="level2 item2"><span>Cabling - UTP &amp; More</span></a></li><li class="level2 item3 parent"><a href="/networking-topics/protocols.html" class="level2 item3 parent"><span>Protocols</span></a></li><li class="level2 item4"><a href="/networking-topics/the-osi-model.html" class="level2 item4"><span>The OSI Model</span></a></li><li class="level2 item5 parent"><a href="/networking-topics/routing.html" class="level2 item5 parent"><span>Routing</span></a></li><li class="level2 item6 parent"><a href="/networking-topics/ethernet.html" class="level2 item6 parent"><span>Ethernet</span></a></li><li class="level2 item7"><a href="/networking-topics/firewalls.html" class="level2 item7"><span>Firewalls</span></a></li><li class="level2 item8 parent"><a href="/networking-topics/vlan-networks.html" class="level2 item8 parent"><span>VLAN Networks</span></a></li><li class="level2 item9"><a href="/networking-topics/network-address-translation-nat.html" class="level2 item9"><span>NAT</span></a></li><li class="level2 item10 last"><a href="/networking-topics/wan-technologies.html" class="level2 item10 last"><span>WAN Technologies</span></a></li></ul></li><li class="level1 item6 parent"><a href="/cisco-technical-knowledgebase.html" class="level1 item6 parent"><span>Cisco KnowledgeBase</span></a><ul class="level2"><li class="level2 item1 first"><a href="/cisco-technical-knowledgebase/cisco-routers.html" class="level2 item1 first"><span style="background-image: url(http://www.firewall.cx/images/stories/icon-cisco-routers.png);">Cisco Routers</span></a></li><li class="level2 item2"><a href="/cisco-technical-knowledgebase/cisco-switches.html" class="level2 item2"><span style="background-image: url(http://www.firewall.cx/images/stories/icon-cisco-switches.png);">Cisco Switches</span></a></li><li class="level2 item3"><a href="/cisco-technical-knowledgebase/cisco-voice.html" class="level2 item3"><span style="background-image: url(http://www.firewall.cx/images/stories/icon-cisco-ccme.png);">Cisco VoIP/CCME</span></a></li><li class="level2 item4"><a href="/cisco-technical-knowledgebase/cisco-wireless.html" class="level2 item4"><span style="background-image: url(http://www.firewall.cx/images/stories/icon-cisco-wireless.png);">Cisco Wireless</span></a></li><li class="level2 item5 last"><a href="/cisco-technical-knowledgebase/cisco-services-tech.html" class="level2 item5 last"><span>Services &amp; Technology</span></a></li></ul></li><li class="level1 item7 parent"><a href="/linux-knowledgebase-tutorials.html" class="level1 item7 parent"><span>Linux Tutorials</span></a><ul class="level2"><li class="level2 item1 first"><a href="/linux-knowledgebase-tutorials/linux-administration.html" class="level2 item1 first"><span>Linux Administration</span></a></li><li class="level2 item3 last"><a href="/linux-knowledgebase-tutorials/system-and-network-services.html" class="level2 item3 last"><span>System Net Services</span></a></li></ul></li><li class="level1 item9 parent"><a href="/microsoft-knowledgebase.html" class="level1 item9 parent"><span>Microsoft KB</span></a><ul class="level2"><li class="level2 item1 first"><a href="/microsoft-knowledgebase/windows-2000-server.html" class="level2 item1 first"><span>Windows 2000 Server</span></a></li><li class="level2 item2 last"><a href="/microsoft-knowledgebase/windows-2003-server.html" class="level2 item2 last"><span>Windows 2003 Server</span></a></li></ul></li><li class="level1 item12 parent active"><a href="/general-topics-reviews.html" class="level1 item12 parent active"><span>General Topics &amp; Reviews</span></a><ul class="level2"><li class="level2 item1 first"><a href="/general-topics-reviews/hot-product-reviews.html" class="level2 item1 first"><span>Hot Product Reviews</span></a></li><li class="level2 item2"><a href="/general-topics-reviews/security-articles.html" class="level2 item2"><span>Security Articles</span></a></li><li class="level2 item3"><a href="/general-topics-reviews/e-mail-security-white-papers.html" class="level2 item3"><span>E-mail Security Papers</span></a></li><li class="level2 item4"><a href="/general-topics-reviews/cloud-based-solutions.html" class="level2 item4"><span>Cloud-Based Solutions</span></a></li><li class="level2 item5 active current"><a href="/general-topics-reviews/free-security-services.html" class="level2 item5 active current"><span>Free Security Services</span></a></li><li class="level2 item6 parent"><a href="/general-topics-reviews/linuxunix-related.html" class="level2 item6 parent"><span style="background-image: url(http://www.firewall.cx/images/stories/icon-linux.png);">Linux/Unix Related</span></a></li><li class="level2 item7"><a href="/general-topics-reviews/other-articles.html" class="level2 item7"><span>Other Articles</span></a></li><li class="level2 item8"><a href="/general-topics-reviews/book-reviews.html" class="level2 item8"><span>Book Reviews</span></a></li><li class="level2 item9"><a href="/general-topics-reviews/cisco-cracker.html" class="level2 item9"><span>Type 7 Password Crack</span></a></li><li class="level2 item10 last"><a href="/general-topics-reviews/wireless-key-generator.html" class="level2 item10 last"><span>WiFi Key Generator</span></a></li></ul></li><li class="level1 item14"><a href="/downloads.html" class="level1 item14"><span>Downloads</span></a></li><li class="level1 item15 last parent"><a href="/site-related.html" class="level1 item15 last parent"><span>Site Related</span></a><ul class="level2"><li class="level2 item1 first"><a href="/site-related/site-awards.html" class="level2 item1 first"><span>Site Awards</span></a></li><li class="level2 item2"><a href="/site-related/site-testimonials.html" class="level2 item2"><span>Site Testimonials</span></a></li><li class="level2 item3"><a href="/site-related/site-history.html" class="level2 item3"><span>Website History</span></a></li><li class="level2 item4"><a href="/site-related/meet-the-team.html" class="level2 item4"><span>Meet The Team</span></a></li><li class="level2 item5"><a href="/site-related/site-map.html" class="level2 item5"><span>Site Map</span></a></li><li class="level2 item6 last"><a href="/site-related/recommended-websites.html" class="level2 item6 last"><span>Recommended Sites</span></a></li></ul></li></ul>
+</div>
+</div>
+</div>
+</div>
+<div id="top">
+<div class="floatbox ie_fix_floats">
+<div class="topbox width33 seperator float-left">
+<div class="module-light">
+<div>
+<div>
+<div>
+<h3>Recommendations</h3>
+<div style="overflow: hidden;"><a href="/general-topics-reviews/security-articles.html"><img class="correct-png" style="margin-left: 10px; float: right;" src="/images/stories/Ethernet-Cable-icon-48x48.png" alt="Ethernet-Cable-icon-48x48" width="48" height="48" />Network Security Articles</a><br /><a href="/cisco-technical-knowledgebase/cisco-voice.html">Cisco UC500 / CCME Articles</a></div></div>
+</div>
+</div>
+</div>
+</div>
+<div class="topbox width33 seperator float-left">
+<div class="module-light">
+<div>
+<div>
+<div>
+<h3>Hot Downloads</h3>
+- <a onclick="javascript:_gaq.push(['_trackEvent','Home-GFI-HotDwld-Languard','click','landlanss.gfi.com/network-scan-sm/?adv=149&amp;loc=91']);" href="http://landlanss.gfi.com/network-scan-sm/?adv=149&amp;loc=91" target="_blank">Nework Security Scanner</a> <img style="float: right;" src="/images/stories/Apps-krfb-icon-48x48.png" alt="Apps-krfb-icon-48x48" width="48" height="48" /><br />- <a onclick="javascript:_gaq.push(['_trackEvent','Home-GFI-HotDwld-MailEssentials','click','http://landmes.gfi.com/stop-spam-exchange-server-sm/?adv=149&amp;loc=93']);" href="http://landmes.gfi.com/stop-spam-exchange-server-sm/?adv=149&amp;loc=93" target="_blank">Server Anti-Spam</a><br />- <a onclick="javascript:_gaq.push(['_trackEvent','Home-GFI-HotDwld-WebMonitor','click','http://http://landwebmonnet.gfi.com/web-security-sm/?adv=149&amp;loc=92']);" href="http://landwebmonnet.gfi.com/web-security-sm/?adv=149&amp;loc=92" target="_blank">Web Monitoring &amp; Web Security</a><br />- <span style="color: #ff0000;">NEW! </span><a onclick="javascript:_gaq.push(['_trackEvent','Home-Colasoft-HotDwld-FreeNetAnalyzer','click','www.firewall.cx/click/redir.php?link=129']);" href="http://clixtrac.com/goto/?90408" target="_blank">Free Packet Sniffer</a> <span style="color: #ff0000;">!!</span><br /></div>
+</div>
+</div>
+</div>
+</div>
+<div class="topbox width33  float-left">
+<div class="module-light">
+<div>
+<div>
+<div>
+<h3>Official CiscoPress Reviewer</h3>
+<a href="/site-news/316-firewall-ciscopress.html">The First and Only Official </a><a href="/site-news/316-firewall-ciscopress.html"><img style="float: right;" src="/images/stories/header/ciscopress-header.gif" alt="ciscopress-header" width="42" height="47" /></a><br /><a href="/site-news/316-firewall-ciscopress.html">Cisco Press Reviewer!</a></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="middle">
+<div class="background">
+<div id="left">
+<div id="left_container" class="clearfix">
+<div class="module">
+<div>
+<div>
+<div>
+<img src='http://www.firewall.cx/components/com_joomlawatch/img.php?rand=61255' border='0' alt='' title=''/></div>
+</div>
+</div>
+</div>
+<div class="module">
+<div>
+<div>
+<div>
+<h3>Firewall.cx Forums</h3>
+<a href="/forum/index.html">Community Forums</a></div>
+</div>
+</div>
+</div>
+<div class="module-new">
+<div>
+<div>
+<div>
+<h3>Facebook Fans</h3>
+<div class="jfbcfan_desc">Show your support for Firewall.cx!</div><div style="position: relative; top:0px; left:0px; z-index: 100;" class="jfbcfan">
+<div class="jfbcfan"><fb:like-box show_faces="false" header="false" stream="false" width="184" height="70" href="http://www.facebook.com/firewallcx" colorscheme="dark" border_color="black"></fb:like-box></div></div>
+</div>
+</div>
+</div>
+</div>
+<div class="module">
+<div>
+<div>
+<div>
+<h3>Social Media Channels</h3>
+<a href="http://www.facebook.com/group.php?gid=29042864367" target="_blank"><img src="/images/stories/Facebook-icon.png" alt="Facebook-icon" width="32" height="32" /></a> <a href="http://www.linkedin.com/groups?home=&amp;gid=1037867" target="_blank"><img src="/images/stories/LinkedIn-icon.png" alt="LinkedIn-icon" width="32" height="32" /></a> <a href="http://twitter.com/firewallcx" target="_blank"><img src="/images/stories/Twitter-icon.png" alt="Twitter-icon" width="32" height="32" /></a><a href="http://twitter.com/firewallcx" target="_blank">  </a><a href="/component/ninjarsssyndicator/?feed_id=1&amp;format=raw"><img src="/images/stories/rssfeed-icon.png" alt="rssfeed-icon" width="32" height="32" /></a></div>
+</div>
+</div>
+</div>
+<div class="module-pick">
+<div>
+<div>
+<div>
+<p style="text-align: center;"><a onclick="javascript:_gaq.push(['_trackEvent','Home-GFI-L1-Module','click','http://landlanss.gfi.com/network-scan-sm/?adv=149&amp;loc=91']);" href="http://landlanss.gfi.com/network-scan-sm/?adv=149&amp;loc=91" target="_blank"><img src="/images/stories/L1-GFI-Banner-1.jpg" alt="L1-GFI-Banner-1" width="104" height="123" /></a></p>
+<p style="text-align: center;"><a onclick="javascript:_gaq.push(['_trackEvent','Home-GFI-L1-Module','click','http://landlanss.gfi.com/network-scan-sm/?adv=149&amp;loc=91']);" href="http://landlanss.gfi.com/network-scan-sm/?adv=149&amp;loc=91" target="_blank"> Download Your Free <br />Network Scanner</a></p></div>
+</div>
+</div>
+</div>
+<div class="module">
+<div>
+<div>
+<div>
+<div><a href="http://clixtrac.com/goto/?90277" target="_blank"><img style="display: block; margin-left: auto; margin-right: auto;" src="/images/stories/colasoft-capsa-network-analyser.jpg" alt="colasoft-capsa-network-analyser" width="119" height="45" /></a></div>
+<div style="text-align: center;"><a href="http://clixtrac.com/goto/?90277" target="_blank">Download Free </a></div>
+<div style="text-align: center;"><a href="http://clixtrac.com/goto/?90277" target="_blank">Network Analyzer </a></div></div>
+</div>
+</div>
+</div>
+<div class="module">
+<div>
+<div>
+<div>
+<h3>System Login</h3>
+<form action="/general-topics-reviews/free-security-services.html" method="post" id="login-form">
+<fieldset class="input">
+<div id="form-login-username">
+<label for="modlgn_username">Username</label><br/>
+<input id="modlgn_username" type="text" name="username" class="inputbox" alt="username" size="18"/>
+</div>
+<div id="form-login-password">
+<label for="modlgn_passwd">Password</label><br/>
+<input id="modlgn_passwd" type="password" name="passwd" class="inputbox" size="18"
+alt="password"/>
+</div>
+<p id="form-login-remember">
+<label for="modlgn_remember">Remember Me</label>
+<input id="modlgn_remember" type="checkbox" name="remember" class="inputbox" value="yes" alt="Remember Me"/>
+</p>
+<input type="submit" name="Submit" class="button" value="Login"/>
+</fieldset>
+<input type="hidden" name="option" value="com_user"/><input type="hidden" name="task" value="login"/><input type="hidden" name="return" value="L2dlbmVyYWwtdG9waWNzLXJldmlld3MvZnJlZS1zZWN1cml0eS1zZXJ2aWNlcy8xMzUtdGNwLWhlYWRlci1hbmFseXNpcy5odG1s"/><input type="hidden" name="50900ed3a1d557b6cb2e257bf3131d67" value="1" /></form>
+<div class="jfbcLogin"><fb:login-button v="2" size="medium" scope="email" onlogin="javascript:jfbc.login.login_button_click();">Login With Facebook</fb:login-button></div><ul><li><a href="/component/user/?task=register">Register for this site</a></li><li><a href="/component/user/remind.html">Forgot Username?</a></li><li><a href="/component/user/reset.html">Forgot Password?</a></li></ul></div>
+</div>
+</div>
+</div>
+<div class="module-pick">
+<div>
+<div>
+<div>
+<h3>Recommended Downloads</h3>
+- <a onclick="javascript:_gaq.push(['_trackEvent','Home-GFI-RecDwld-WebMonitor','click','http://landwebmonnet.gfi.com/web-security-sm/?adv=149&amp;loc=92']);" href="http://landwebmonnet.gfi.com/web-security-sm/?adv=149&amp;loc=92" target="_blank">Web Security</a> <br />- <a onclick="javascript:_gaq.push(['_trackEvent','Home-GFI-RecDwld-MailEssentials','click','http://landmes.gfi.com/stop-spam-exchange-server-sm/?adv=149&amp;loc=93']);" href="http://landmes.gfi.com/stop-spam-exchange-server-sm/?adv=149&amp;loc=93" target="_blank">Server AntiSpam</a> <br />- <a onclick="javascript:_gaq.push(['_trackEvent','Home-GFI-RecDwld-LanGuard','click','http://landlanss.gfi.com/network-scan-sm/?adv=149&amp;loc=91']);" href="http://landlanss.gfi.com/network-scan-sm/?adv=149&amp;loc=91" target="_blank">Network Scanner</a> <br />- <a href="/downloads/cat_view/120-network-sniffers-packet-capturing.html">Packet Sniffers</a> <br />- <a onclick="javascript:_gaq.push(['_trackEvent','Home-GFI-RecDwld-EventsManager','click','http://landesm.gfi.com/intrusion-detection-sm/?adv=149&amp;loc=110']);" href="http://landesm.gfi.com/intrusion-detection-sm/?adv=149&amp;loc=110" target="_blank">IDS Security Manager</a> <br />- <a onclick="javascript:_gaq.push(['_trackEvent','Home-GFI-RecDwld-WebMonitor','click','http://landwebmonnet.gfi.com/web-security-sm/?adv=149&amp;loc=92']);" href="http://landwebmonnet.gfi.com/web-security-sm/?adv=149&amp;loc=92" target="_blank">Web-Proxy Monitor</a> <br />- <a href="/downloads/cat_view/123-ftp--tftp-servers-a-clients.html">FTP / TFTP Servers</a> <br />- <a href="/downloads/cat_view/167-cisco-tools-a-applications.html">Cisco VPN Client</a><br />- <a href="http://clixtrac.com/goto/?90416" target="_blank">nChronos Network Analysis Server</a><br /></div>
+</div>
+</div>
+</div>
+<div class="module">
+<div>
+<div>
+<div>
+<h3>More Articles</h3>
+<script type="text/javascript">
+window.addEvent('load', function(){
+var yos_article_5063081e902f2 = new Tips($$('.yos_article_5063081e902f2'), {
+initialize:function(){this.fx = new Fx.Style(this.toolTip, 'opacity', {duration: 500, wait: false}).set(0);},onShow: function(toolTip) {this.fx.start(1);},onHide: function(toolTip) {this.fx.start(0);},showDelay: 0,
+hideDelay: 0,
+className: 'yos_article_5063081e902f2'
+});
+});
+</script>
+<div class="yos_list_article"><span><b></b></span><ul style="text-align:left;">
+<li>
+<a class="yos_article_5063081e902f2" title="TCP Flag Options - Section 4::Introduction
+As we have seen in the previous pages, some TCP segments carry data while others..." href="/general-topics-reviews/free-security-services/136-tcp-flag-options.html">TCP Flag Options - Section 4</a>  
+</li>
+<li>
+<a class="yos_article_5063081e902f2" title="TCP Data - Section 7::Introduction
+Finally, the last page of our incredible TCP Analysis. As most of you would expect,..." href="/general-topics-reviews/free-security-services/139-tcp-data-section.html">TCP Data - Section 7</a>  
+</li>
+<li>
+<a class="yos_article_5063081e902f2" title="TCP Window Size, Checksum &amp; Urgent Pointer - Section 5::Introduction
+Our fifth section contains some very interesting fields that are used by the TCP transport..." href="/general-topics-reviews/free-security-services/137-tcp-window-size-checksum.html">TCP Window Size, Checksum & Urgent Pointer - Section 5</a>  
+</li>
+<li>
+<a class="yos_article_5063081e902f2" title="Analysing TCP Header Options - Section 6::Introduction
+The TCP Options (MSS, Window Scaling, Selective Acknowledgements, Timestamps, Nop) are located at the end..." href="/general-topics-reviews/free-security-services/138-tcp-options.html">Analysing TCP Header Options - Section 6</a>  
+</li>
+<li>
+<a class="yos_article_5063081e902f2" title="TCP, A Transport Protocol::Introduction
+Understanding how each protocol fits into the OSI Model is essential for any network engineer...." href="/general-topics-reviews/free-security-services/129-tcp-transport-protocol.html">TCP, A Transport Protocol</a>  
+</li>
+<li>
+<a class="yos_article_5063081e902f2" title="Quick Overview Of TCP::Introduction
+As previously mentioned on a number of occasions, TCP is one of the two protocols..." href="/general-topics-reviews/free-security-services/130-protocols-tcp-overview.html">Quick Overview Of TCP</a>  
+</li>
+<li>
+<a class="yos_article_5063081e902f2" title="The TCP Header/Segment::Introduction
+This article shows the TCP Header and Segment. We explain where the TCP Header and..." href="/general-topics-reviews/free-security-services/131-protocols-tcp-segment.html">The TCP Header/Segment</a>  
+</li>
+<li>
+<a class="yos_article_5063081e902f2" title="In-Depth TCP Header Analysis - Introduction::Introduction
+This article is an introduction to the 7-page TCP Header analysis section that follows. We..." href="/general-topics-reviews/free-security-services/132-tcp-header-intro.html">In-Depth TCP Header Analysis - Introduction</a>  
+</li>
+<li>
+<a class="yos_article_5063081e902f2" title="TCP Source &amp; Destination Port Number - Section 1::Introduction
+This section contains one of the most well-known fields in the TCP header, the Source..." href="/general-topics-reviews/free-security-services/133-tcp-source-destination-ports.html">TCP Source & Destination Port Number - Section 1</a>  
+</li>
+<li>
+<a class="yos_article_5063081e902f2" title="TCP Sequence &amp; Acknowledgement Numbers - Section 2::Introduction
+This page will closely examine the Sequence and Acknowledgement numbers. The very purpose of their..." href="/general-topics-reviews/free-security-services/134-tcp-seq-ack-numbers.html">TCP Sequence & Acknowledgement Numbers - Section 2</a>  
+</li></ul></div></div>
+</div>
+</div>
+</div>
+<div class="module">
+<div>
+<div>
+<div>
+<h3>Who's Online</h3>
+We have&nbsp;226 guests&nbsp;online</div>
+</div>
+</div>
+</div>
+<div class="module">
+<div>
+<div>
+<div>
+<h3>Statistics</h3>
+<strong>Members</strong> : 5272<br />
+<strong>Content</strong> : 745<br />
+<strong>Web Links</strong> : 9<br />
+<strong>Content View Hits</strong> : 99940067<br />
+</div>
+</div>
+</div>
+</div>
+<div class="module">
+<div>
+<div>
+<div>
+<h3>Top Website Visitors</h3>
+<link rel='stylesheet' href='http://www.firewall.cx/components/com_joomlawatch/css/joomlawatch.css' type='text/css' />
+<table border='0' class='joomlawatch'><tr><td valign='top' align='right' class='joomlawatch'>39.4%</td><td valign='top' align='left' class='joomlawatch'><img src='http://www.firewall.cx/components/com_joomlawatch/flags/us.png' title='United States' alt='United States'/>&nbsp;</td><td valign='top' align='left' class='joomlawatch'>United States</td></tr><tr><td valign='top' align='right' class='joomlawatch'>19.6%</td><td valign='top' align='left' class='joomlawatch'><img src='http://www.firewall.cx/components/com_joomlawatch/flags/in.png' title='India' alt='India'/>&nbsp;</td><td valign='top' align='left' class='joomlawatch'>India</td></tr><tr><td valign='top' align='right' class='joomlawatch'>7.2%</td><td valign='top' align='left' class='joomlawatch'><img src='http://www.firewall.cx/components/com_joomlawatch/flags/gb.png' title='United Kingdom' alt='United Kingdom'/>&nbsp;</td><td valign='top' align='left' class='joomlawatch'>United Kingdom</td></tr><tr><td valign='top' align='right' class='joomlawatch'>6.3%</td><td valign='top' align='left' class='joomlawatch'><img src='http://www.firewall.cx/components/com_joomlawatch/flags/au.png' title='Australia' alt='Australia'/>&nbsp;</td><td valign='top' align='left' class='joomlawatch'>Australia</td></tr><tr><td valign='top' align='right' class='joomlawatch'>3.8%</td><td valign='top' align='left' class='joomlawatch'><img src='http://www.firewall.cx/components/com_joomlawatch/flags/ca.png' title='Canada' alt='Canada'/>&nbsp;</td><td valign='top' align='left' class='joomlawatch'>Canada</td></tr><tr><td valign='top' align='right' class='joomlawatch'>2.9%</td><td valign='top' align='left' class='joomlawatch'><img src='http://www.firewall.cx/components/com_joomlawatch/flags/de.png' title='Germany' alt='Germany'/>&nbsp;</td><td valign='top' align='left' class='joomlawatch'>Germany</td></tr></table><br/><table border='0' class='joomlawatch'><tr><td align='left' valign='top' class='joomlawatch'>Today: </td><td align='left' valign='top'> 5558</td></tr><tr><td align='left' valign='top' class='joomlawatch'>Yesterday: </td><td align='left' valign='top'> 9166</td></tr><tr><td align='left' valign='top' class='joomlawatch'>This Week: </td><td align='left' valign='top'> 23468</td></tr><tr><td align='left' valign='top' class='joomlawatch'>Last Week: </td><td align='left' valign='top'> 50041</td></tr><tr><td align='left' valign='top' class='joomlawatch'>This Month: </td><td align='left' valign='top'> 172299</td></tr><tr><td align='left' valign='top' class='joomlawatch'>Last Month: </td><td align='left' valign='top'> 172533</td></tr><tr><td align='left' valign='top' class='joomlawatch'>Total: </td><td align='left' valign='top'> 1644627</td></tr></table></div>
+</div>
+</div>
+</div>
+<div class="module-headline">
+<div>
+<div>
+<div>
+<h3>Popular Cisco  Articles</h3>
+<a href="/cisco-technical-knowledgebase/cisco-routers/250-cisco-router-basics.html">Router Introduction</a><br /><a href="/cisco-technical-knowledgebase/cisco-routers/255-cisco-router-sdm.html">Cisco SDM Installation</a><br /><a href="/cisco-technical-knowledgebase/cisco-routers/813-cisco-router-ipsla-basic.html">Cisco IP SLA</a><br /><a href="/cisco-technical-knowledgebase/cisco-services-tech/348-cisco-smartcare-intro.html">Cisco SmartCare Service</a><br /><a href="/networking-topics/vlan-networks/226-vlan-security.html">VLAN Security</a><br /><a href="/cisco-technical-knowledgebase/cisco-switches/340-cisco-switches-catalyst-4507r-e.html">4507R-E Installation</a><br /><a href="/cisco-technical-knowledgebase/cisco-voice/369-cisco-ccme-gui-part-1.html">CCME - UC500 GUI</a><br /><a href="/cisco-technical-knowledgebase/cisco-voice/367-cisco-voice-ccme-intro.html">CallManager Express Intro</a><br /><a href="/cisco-technical-knowledgebase/cisco-switches/818-cisco-switches-vlan-security.html">VLAN Security &amp; Tips</a><br /><a href="/cisco-wireless/828-cisco-wireless-wlan-keygen.html">Wireless LAN Key Generator</a><br /></div>
+</div>
+</div>
+</div>
+<div class="module">
+<div>
+<div>
+<div>
+<h3>Gold Cisco Lab Partners</h3>
+<a onclick="javascript:_gaq.push(['_trackEvent','Home-GFI-GoldLabPartners','click','http://www.gfi.com/?adv=149&amp;loc=92']);" href="http://www.gfi.com/?adv=149&amp;loc=92" target="_blank"><img style="border: 2px solid #000000; float: left;" src="/images/stories/logo-gfi.jpg" alt="logo-gfi" width="85" height="42" /><br /><br /><br /><br /><img style="border: 2px solid #000000; float: left;" src="/images/stories/logo-datavision.gif" alt="logo-datavision" width="96" height="16" /></a><br /></div>
+</div>
+</div>
+</div>
+<div class="module-headline">
+<div>
+<div>
+<div>
+<h3>Popular Linux Articles</h3>
+<a href="/linux-knowledgebase-tutorials/linux-administration/845-linux-administration-runlevels.html">Linux Init &amp; RunLevels</a><br /><a href="/linux-knowledgebase-tutorials/linux-administration/842-linux-groups-user-accounts.html">Linux Groups &amp; Users</a><br /><a href="/linux-knowledgebase-tutorials/linux-administration/837-linux-system-resource-monitoring.html">Performance Monitoring</a><br /><a href="/linux-knowledgebase-tutorials/linux-administration/836-linux-vi.html">Linux Vim Editor</a><br /><a href="/linux-knowledgebase-tutorials/system-and-network-services/848-linux-services-samba.html">Linux Samba</a><br /><a href="/linux-knowledgebase-tutorials/system-and-network-services/849-linux-services-dhcp-server.html">Linux DHCP Server</a><br /><a href="/general-topics-reviews/linuxunix-related/829-linux-bind-introduction.html">Linux Bind DNS</a><br /><a href="/general-topics-reviews/linuxunix-related/introduction-to-linux/299-linux-file-folder-permissions.html">File &amp; Folder Permissions</a><br /><a href="/general-topics-reviews/linuxunix-related/openmosix-linux-supercomputer.html">Linux OpenMosix</a><br /><a href="/linux-knowledgebase-tutorials/linux-administration/851-linux-services-tcpip.html">Linux Network Config</a><br /></div>
+</div>
+</div>
+</div>
+<div class="module">
+<div>
+<div>
+<div>
+<h3>Best Rated Content</h3>
+<ul class="db8bestratedcontent">
+<li class="mostread">
+<a href="/networking-topics/protocols/870-ipsec-modes.html" class="db8bestratedcontent"
+>
+Understanding VPN IPSec Tunnel Mode and IPSec Transport Mode - What's the Difference?</a>
+</li>
+<li class="mostread">
+<a href="/general-topics-reviews/hot-product-reviews/859-reviews-gfi-languard-2011.html" class="db8bestratedcontent"
+>
+Product Review - GFI LanGuard Network Security Scanner 2011</a>
+</li>
+<li class="mostread">
+<a href="/networking-topics/protocols/tcp/137-tcp-window-size-checksum.html" class="db8bestratedcontent"
+>
+TCP Window Size, Checksum &amp; Urgent Pointer - Section 5</a>
+</li>
+<li class="mostread">
+<a href="/general-topics-reviews/security-articles/267-network-security-intro.html" class="db8bestratedcontent"
+>
+Introduction To Network Security - Part 1</a>
+</li>
+<li class="mostread">
+<a href="/networking-topics/protocols/tcp/138-tcp-options.html" class="db8bestratedcontent"
+>
+Analysing TCP Header Options - Section 6</a>
+</li>
+<li class="mostread">
+<a href="/networking-topics/network-address-translation-nat/232-nat-dynamic-part-2.html" class="db8bestratedcontent"
+>
+Dynamic NAT - Part 2</a>
+</li>
+<li class="mostread">
+<a href="/cisco-technical-knowledgebase/cisco-routers/249-introduction-routers.html" class="db8bestratedcontent"
+>
+Introduction To Routers</a>
+</li>
+<li class="mostread">
+<a href="/cisco-technical-knowledgebase/cisco-switches/340-cisco-switches-catalyst-4507r-e.html" class="db8bestratedcontent"
+>
+Installation of a Cisco Catalyst 4507R-E Layer 3 Switch</a>
+</li>
+<li class="mostread">
+<a href="/networking-topics/protocols/127-ip-security-protocol.html" class="db8bestratedcontent"
+>
+IPSec - Internet Protocol Security</a>
+</li>
+<li class="mostread">
+<a href="/networking-topics/network-address-translation-nat/229-nat-static-part-1.html" class="db8bestratedcontent"
+>
+Static NAT - Part 1</a>
+</li>
+<li class="mostread">
+<a href="/cisco-technical-knowledgebase/cisco-services-tech/847-cisco-vpn-client-troubleshoot.html" class="db8bestratedcontent"
+>
+Troubleshooting Cisco VPN Client - How To Fix  Reason 442: Failed to Enable Virtual Adapter</a>
+</li>
+<li class="mostread">
+<a href="/general-topics-reviews/hot-product-reviews/894-reviews-colasoft-nchronos.html" class="db8bestratedcontent"
+>
+Colasoft: nChronos v3 Server and Console Review</a>
+</li>
+<li class="mostread">
+<a href="/networking-topics/general-networking/108-multicast-ip-list.html" class="db8bestratedcontent"
+>
+Multicast IP Address List</a>
+</li>
+<li class="mostread">
+<a href="/networking-topics/protocols/124-upd-protocol.html" class="db8bestratedcontent"
+>
+UDP Protocol - Header</a>
+</li>
+<li class="mostread">
+<a href="/networking-topics/protocols/tcp/130-protocols-tcp-overview.html" class="db8bestratedcontent"
+>
+Quick Overview Of TCP</a>
+</li>
+<li class="mostread">
+<a href="/networking-topics/protocols/tcp/131-protocols-tcp-segment.html" class="db8bestratedcontent"
+>
+The TCP Header/Segment</a>
+</li>
+<li class="mostread">
+<a href="/networking-topics/vlan-networks/221-vlan-8021q-analysis.html" class="db8bestratedcontent"
+>
+VLANs - IEEE 802.1q Trunk Link Protocol Analysis</a>
+</li>
+<li class="mostread">
+<a href="/cisco-wireless/839-cisco-wireless-radio-settings.html" class="db8bestratedcontent"
+>
+Understanding, Configuring &amp; Tweaking Web-based Cisco Aironet Access Point. Network Interface Radio0 802.11a/b/g Settings</a>
+</li>
+<li class="mostread">
+<a href="/networking-topics/general-networking/110-network-broadcast-multicast-control.html" class="db8bestratedcontent"
+>
+Controlling Broadcasts and Multicasts</a>
+</li>
+<li class="mostread">
+<a href="/networking-topics/cabling-utp-fibre/116-network-cabling-100basetx.html" class="db8bestratedcontent"
+>
+100Base-(T) TX/T4/FX - Ethernet</a>
+</li>
+<li class="mostread">
+<a href="/networking-topics/protocols/icmp-protocol/156-icmp-time-exceeded.html" class="db8bestratedcontent"
+>
+ICMP - Time Exceeded Message Analysis</a>
+</li>
+<li class="mostread">
+<a href="/networking-topics/protocols/domain-name-system-dns/159-protocols-dns-resolution.html" class="db8bestratedcontent"
+>
+DNS Queries &amp; Resolution Process</a>
+</li>
+<li class="mostread">
+<a href="/networking-topics/routing/180-routed-protocols.html" class="db8bestratedcontent"
+>
+Routed Protocols </a>
+</li>
+<li class="mostread">
+<a href="/networking-topics/vlan-networks/226-vlan-security.html" class="db8bestratedcontent"
+>
+VLAN Security - Making the Most of VLANs</a>
+</li>
+<li class="mostread">
+<a href="/cisco-technical-knowledgebase/cisco-switches/885-cisco-switches-sg500-52p.html" class="db8bestratedcontent"
+>
+Installation and Setup of Cisco SG500-52P - 500 Series Stackable Managed Switches</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="main">
+<div id="main_container" class="clearfix">
+<div id="mainmiddle" class="floatbox">
+<div id="content">
+<div id="content_container" class="clearfix">
+<div id="breadcrumb">
+<span class="breadcrumbs pathway">
+<a href="http://www.firewall.cx/" class="pathway">Home</a> <img src="/templates/yoo_ambient/images/arrow.png" alt=""  /> <a href="/general-topics-reviews.html" class="pathway">General Topics &amp; Reviews</a> <img src="/templates/yoo_ambient/images/arrow.png" alt=""  /> <a href="/general-topics-reviews/free-security-services.html" class="pathway">Free Security Services</a> <img src="/templates/yoo_ambient/images/arrow.png" alt=""  /> TCP Header Length Analysis - Section 3</span>
+</div>
+<div class="floatbox">
+<table class="contentpaneopen">
+<tr>
+<td class="contentheading" width="100%">
+TCP Header Length Analysis - Section 3</td>
+<td align="right" width="100%" class="buttonheading">
+<a href="/general-topics-reviews/free-security-services/135-tcp-header-analysis.pdf" title="PDF" onclick="window.open(this.href,'win2','status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=640,height=480,directories=no,location=no'); return false;" rel="nofollow"><img src="/templates/yoo_ambient/images/pdf_button.png" alt="PDF"  /></a></td>
+<td align="right" width="100%" class="buttonheading">
+<a href="/general-topics-reviews/free-security-services/135-tcp-header-analysis.html?tmpl=component&amp;print=1&amp;page=" title="Print" onclick="window.open(this.href,'win2','status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=640,height=480,directories=no,location=no'); return false;" rel="nofollow"><img src="/templates/yoo_ambient/images/printButton.png" alt="Print"  /></a></td>
+<td align="right" width="100%" class="buttonheading">
+<a href="/component/mailto/?tmpl=component&amp;link=43a4f1c052a88de80d94c944a44307549bfe82d3" title="Email" onclick="window.open(this.href,'win2','width=400,height=350,menubar=yes,resizable=yes'); return false;"><img src="/templates/yoo_ambient/images/emailButton.png" alt="Email"  /></a></td>
+</tr>
+</table>
+<div class="votitaly-inline-rating" id="votitaly-inline-rating-135">
+<div class="votitaly-get-id" style="display:none;">135</div> 
+<div class="votitaly-inline-rating-stars">
+<ul class="votitaly-star-rating">
+<li class="current-rating" style="width:100%;">&nbsp;</li>
+<li><a title="1 star out of 5" class="votitaly-toggler one-star">1</a></li>
+<li><a title="2 stars out of 5" class="votitaly-toggler two-stars">2</a></li>
+<li><a title="3 stars out of 5" class="votitaly-toggler three-stars">3</a></li>
+<li><a title="4 stars out of 5" class="votitaly-toggler four-stars">4</a></li>
+<li><a title="5 stars out of 5" class="votitaly-toggler five-stars">5</a></li>
+</ul>
+</div>
+<div class="votitaly-box">
+(2 votes, average 5.00 out of 5)
+</div>
+</div>
+<table class="contentpaneopen">
+<tr>
+<td valign="top">
+<span class="small">
+Written by Administrator</span>
+&nbsp;&nbsp;
+</td>
+</tr>
+<tr>
+<td valign="top" class="createdate">
+Sunday, 01 May 2011 03:00</td>
+</tr>
+<tr>
+<td valign="top">
+<div style="position: relative; top:0px; left:0px; z-index: 100;" class="scsocialbuttons"><div class="jlinkedShare"><script type="IN/Share" data-url="http://www.firewall.cx/networking-topics/protocols/tcp/135-tcp-header-analysis.html"></script></div><div class="sc_twittershare"><a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.firewall.cx/networking-topics/protocols/tcp/135-tcp-header-analysis.html" data-count="none">Tweet</a></div><div class="sc_gplusone"><g:plusone size="standard" annotation="none" href="http://www.firewall.cx/networking-topics/protocols/tcp/135-tcp-header-analysis.html"></g:plusone></div><link rel="stylesheet" href="http://www.firewall.cx/components/com_jfbconnect/assets/jfbconnect.css" type="text/css" /><div class="jfbclike"><fb:like href="http://www.firewall.cx/networking-topics/protocols/tcp/135-tcp-header-analysis.html" show_faces="true" send="true" layout="standard" width="250" action="like" font="verdana" colorscheme="light"></fb:like></div></div><div style="clear:left"></div> <div class='joomla_add_this'>
+<script type='text/javascript'>
+var addthis_product = 'jlp-1.2';
+var addthis_config =
+{username : 'firewallcx',
+ui_cobrand : 'Share it with the World!',
+services_compact : 'email, digg, stumbleupon, delicious, twitter',
+ui_language : 'en',
+ui_hide_embed : false,
+data_track_clickback : true}</script>
+<a   href="http://www.addthis.com/bookmark.php"  onmouseover="return addthis_open(this,'', 'http://www.firewall.cx/networking-topics/protocols/tcp/135-tcp-header-analysis.html', 'TCP Header Length Analysis - Section 3' )"  onmouseout='addthis_close();' onclick='return addthis_sendto();'  onclick="javascript:_gaq.push(['_trackEvent','Cisco-Type7-GFI','click','www.addthis.com/bookmark.php']);" ><img src='http://s7.addthis.com/static/btn/v2/lg-share-en.gif' border='0' alt='AddThis Social Bookmark Button' /></a>
+<script type='text/javascript' src='http://s7.addthis.com/js/250/addthis_widget.js'></script>
+</div><br /><br />
+<h4>Introduction</h4>
+<p style="text-align: justify;" align="left">The third field under close examination is the TCP Header length. There really isn't that much to say about the Header length other than to explain what it represents and how to interpret its values, but this alone is very important as you will soon see.</p>
+<p style="text-align: justify;" align="left">Let's take a quick look at the TCP Header length field, noting its position within the TCP structure:</p>
+<p align="left"><img style="margin: 5px; float: left;" src="/images/stories/tcp-analysis-section-3-1.gif" alt="tcp-analysis-section-3-1" width="310" height="147" /></p>
+<p style="text-align: justify;">You might also have seen the Header length represented as "Data offset" in other packet sniffers or applications, this is virtually the same as the Header length, only with a 'fancier' name.</p>
+<p style="text-align: justify;"><span style="color: #ccffcc;"><strong>Analysing the Header length</strong></span></p>
+<p style="text-align: justify;">If you open any networking book that covers the TCP header, you will almost certainly find the following description for this particular field:</p>
+<br /><br />
+<p style="text-align: justify;">"<span style="color: #00ffff;"><em>An interger that specifies the length of the segment header measured in 32-bit multiples</em></span>" (Internetworking with TCP/IP, Douglas E. Comer, p. 204, 1995). This description sounds impressive, but when you look at the packet, you're most likely to scratch your head thinking: what exactly did that mean?</p>
+<p style="text-align: justify;">Well, you can cease being confused because we are going to cover it step by step, giving answers to all possible questions you might have. If we don't cover your questions completely, well... there are always our forums to turn to!</p>
+<h4 style="text-align: justify;"><span style="color: #99ccff;"><br /></span></h4>
+<h4 style="text-align: justify;"><span style="color: #99ccff;">Step 1 - What portion is the "Header length"?</span></h4>
+<p style="text-align: justify;">Before we dive into analysing the meaning of the values used in this field, which by the way changes with every packet, we need to understand which portion on the packet is the "Header length".</p>
+<p> </p>
+<p><img style="margin: 5px; float: left;" src="/images/stories/tcp-analysis-section-3-2.gif" alt="tcp-analysis-section-3-2" width="310" height="472" /></p>
+<p> </p>
+<p style="text-align: justify;">Looking at the screen shot on the left, the light blue highlighted section shows us the section that's counted towards the Header length value. With this in mind, you can see that the total length of the light blue section (header length) is 28 bytes.</p>
+<p style="text-align: justify;">The Header length field is required because of the TCP Options field, which contains various options that might or might not be used. Logically, if no options are used then the header length will be much smaller.</p>
+<p style="text-align: justify;">If you take a look at our example, you will notice the 'TCP Options' is equal to 'yes', meaning there are options in this field that are used in this particular connection. We've expanded the section to show the TCP options used and these are 'Max Segment' and 'SACK OK'. These will be analysed in the pages which follow, at the present time though we are interested in whether the TCP options are used or not.</p>
+<p style="text-align: justify;">As the packet in our screenshot reaches the receiving end, the receiver will read the header length field and know exactly where the data portion starts.</p>
+<p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
+<p style="text-align: justify;">This data will be carried to the layers above, while the TCP header will be stripped and disregarded. In this example, we have no data, which is normal since the packet is initiating a 3-way handshake (Flags, SYN=1), but we will cover that in more depth on the next page.</p>
+<p style="text-align: justify;">The main issue requiring our attention deals with the values used for the header length field and learning how to interpret them correctly.</p>
+<h4 style="text-align: justify;"><span style="color: #ffff00;"><br /></span></h4>
+<h4 style="text-align: justify;"><span style="color: #ffff00;">Step 2 - Header Value Analysis</span></h4>
+<p style="text-align: justify;">From the screen shot above, we can see our packet sniffer indicating that the field has a value of 7(hex) and this is interpreted as 28 bytes. To calculate this, you take the value of 7, multiply it by 32 and divide the result by 8: 7x32=224/8=28 bytes.</p>
+<p style="text-align: justify;">Do you recall the definition given at the beginning of this page? "<span style="color: #00ffff;"><em>An interger that specifies the length of the segment header measured in 32-bit multiples</em></span>". This was the formal way of describing these calculations :)</p>
+<p style="text-align: justify;">The calculation given is automatically performed by our packet sniffer, which is quite thoughtful, wouldn't you agree? This can be considered, if you like, as an additional <em>'feature'</em> found on most serious packet sniffers.</p>
+<p style="text-align: justify;">Below you will find another screen shot from our packet sniffer that shows a portion of the TCP header (left frame) containing the header length field. On the right frame, the packet sniffer shows the packet's contents in hex:</p>
+<p align="center"><img style="border: 1px solid #000000; display: block; margin-left: auto; margin-right: auto;" src="/images/stories/tcp-analysis-section-3-3.gif" alt="tcp-analysis-section-3-3" width="620" height="96" /></p>
+<p style="text-align: justify;">By selecting the Header length field on the left, the program automatically highlights the corresponding section and hex value on the right frame. According to the packet sniffer, the hex value '70' is the value for the header length field.</p>
+<p style="text-align: justify;">If you recall at the beginning of the page, we mentioned the header length field being 4 bits long. This means that when viewing the value in hex, we should only have one digit or character highlighted, but this isn't the case here because the packet sniffer has incorrectly highlighted the '7' and '0' together, giving us the impression that the field is 8 bits long!</p>
+<p style="text-align: justify;">Note: In hex, each character e.g '7' represents 4 bits. This means that on the right frame, only '7' should be highlighted, and not "70". Furthermore, if we were to convert '7' hex to binary, the result would be '0111' (notice the total amount of bits is equal to 4).</p>
+<h4 style="text-align: justify;"><span style="color: #ffcc00;"><br /></span></h4>
+<h4 style="text-align: justify;"><span style="color: #ffcc00;">Summary</span></h4>
+<p style="text-align: justify;">The 'Header length' field is very simple as it contains only a number that allows the receiving end to calculate the number of bytes in the TCP Header. At the same time, it is mandatory because without it there is no way the receiver will know where the data portion begins!</p>
+<p style="text-align: justify;">Logically, wherever the TCP header ends, the data begins - this is clear in the screen shots provided on this page. So, if you find yourself analysing packets and trying to figure out where the data starts, all you need to do is find the TCP Header, read the "Header length" value and you can find exactly where the data portion starts!</p>
+<p style="text-align: justify;">Next up are the TCP flags that most of us have come across when talking about the famous 3-way handshake and virtual connections TCP creates before exchanging data.</p>
+<p style="text-align: justify;"> </p>
+<p style="text-align: right;" align="right">Next: <a  href="/networking-topics/protocols/tcp/136-tcp-flag-options.html">TCP Flags - Section 4</a></p>
+<p style="text-align: justify;"> </p>
+<div class="linkr-rl"><div class="linkr-rl-t"> Related Articles </div><ul><li><a  href="http://www.firewall.cx/networking-topics/the-osi-model/173-osi-layer2.html" >OSI Layer 2 - Datalink Layer</a></li><li><a  href="http://www.firewall.cx/networking-topics/protocols/icmp-protocol/154-icmp-source-quench.html" >ICMP - Source Quench Message Analysis</a></li><li><a  href="http://www.firewall.cx/networking-topics/protocols/tcp/139-tcp-data-section.html" >TCP Data - Section 7</a></li><li><a  href="http://www.firewall.cx/networking-topics/protocols/protocols-ip/164-protocols-ip-header.html" >The Internet Protocol (IP) Header</a></li><li><a  href="http://www.firewall.cx/networking-topics/cabling-utp-fibre/115-network-cabling-10base-t.html" >10Base-T/2/5/F/35 - Ethernet</a></li></ul></div><div class="jfbccomments"><fb:comments href="http://www.firewall.cx/networking-topics/protocols/tcp/135-tcp-header-analysis.html" width="350" num_posts="10" colorscheme="dark"></fb:comments></div></td>
+</tr>
+<tr>
+<td class="modifydate">
+Last Updated on Sunday, 02 October 2011 00:28</td>
+</tr>
+</table>
+<span class="article_separator">&nbsp;</span>
+</div>
+<div id="contentbottom" class="floatbox">
+<div class="contentbottombox left width100  float-left">
+<div class="module-pick">
+<div>
+<div>
+<div>
+<h3>SIMILAR TOPICS THAT MIGHT INTEREST</h3>
+<script type="text/javascript">
+window.addEvent('load', function(){
+var yos_article_5063081d7ed00 = new Tips($$('.yos_article_5063081d7ed00'), {
+initialize:function(){this.fx = new Fx.Style(this.toolTip, 'opacity', {duration: 500, wait: false}).set(0);},onShow: function(toolTip) {this.fx.start(1);},onHide: function(toolTip) {this.fx.start(0);},showDelay: 0,
+hideDelay: 2,
+className: 'yos_article_5063081d7ed00'
+});
+});
+</script>
+<div class="yos_list_article"><span><b></b></span><ul style="text-align:left;">
+<li>
+<a href="/general-topics-reviews/free-security-services/129-tcp-transport-protocol.html">TCP, A Transport Protocol</a>  
+</li>
+<li>
+<a href="/general-topics-reviews/free-security-services/130-protocols-tcp-overview.html">Quick Overview Of TCP</a>  
+</li>
+<li>
+<a href="/general-topics-reviews/free-security-services/131-protocols-tcp-segment.html">The TCP Header/Segment</a>  
+</li>
+<li>
+<a href="/general-topics-reviews/free-security-services/132-tcp-header-intro.html">In-Depth TCP Header Analysis - Introduction</a>  
+</li>
+<li>
+<a href="/general-topics-reviews/free-security-services/133-tcp-source-destination-ports.html">TCP Source & Destination Port Number - Section 1</a>  
+</li>
+<li>
+<a href="/general-topics-reviews/free-security-services/134-tcp-seq-ack-numbers.html">TCP Sequence & Acknowledgement Numbers - Section 2</a>  
+</li>
+<li>
+<a href="/general-topics-reviews/free-security-services/136-tcp-flag-options.html">TCP Flag Options - Section 4</a>  
+</li>
+<li>
+<a href="/general-topics-reviews/free-security-services/137-tcp-window-size-checksum.html">TCP Window Size, Checksum & Urgent Pointer - Section 5</a>  
+</li>
+<li>
+<a href="/general-topics-reviews/free-security-services/138-tcp-options.html">Analysing TCP Header Options - Section 6</a>  
+</li>
+<li>
+<a href="/general-topics-reviews/free-security-services/139-tcp-data-section.html">TCP Data - Section 7</a>  
+</li></ul></div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="bottom">
+<div class="floatbox ie_fix_floats">
+<div class="bottombox width33 seperator float-left">
+<div class="module">
+<div>
+<div>
+<div>
+<center><a href="/component/user/register.html"><img class="correct-png" style="margin-top: 10px;" title="Sign up today!" src="/images/yootheme/bottom_signup.png" alt="Sign up today!" width="150" height="40" /></a></center></div>
+</div>
+</div>
+</div>
+</div>
+<div class="bottombox width33 seperator float-left">
+<div class="module">
+<div>
+<div>
+<div>
+<br /><center><a href="http://www.facebook.com/group.php?gid=29042864367" target="_blank"><img src="/images/stories/Facebook-icon.png" alt="Facebook-icon" width="32" height="32" /></a> <a href="http://www.linkedin.com/groups?home=&amp;gid=1037867" target="_blank"><img src="/images/stories/LinkedIn-icon.png" alt="LinkedIn-icon" width="32" height="32" /></a> <a href="http://twitter.com/firewallcx" target="_blank"><img src="/images/stories/Twitter-icon.png" alt="Twitter-icon" width="32" height="32" /></a>  <a href="/component/ninjarsssyndicator/?feed_id=1&amp;format=raw"><img src="/images/stories/rssfeed-icon.png" alt="rssfeed-icon" width="32" height="32" /></a></center></div>
+</div>
+</div>
+</div>
+</div>
+<div class="bottombox width33  float-left">
+<div class="module">
+<div>
+<div>
+<div>
+<p style="text-align: center;"><a href="http://landmes.gfi.com/stop-spam-exchange-server-sm/?adv=149&amp;loc=93" target="_blank">Server AntiSpam Solution</a></p></div>
+</div>
+</div>
+</div>
+</div>
+<div class="bottomblock width100 float-left">
+<div class="module">
+<div>
+<div>
+<div>
+<span style="font-size: 8pt;">Friendly Sites<a href="http://www.kindykids.gr" target="_blank">:</a> <a onclick="javascript:_gaq.push(['_trackEvent','Home-GFI-Footer-GFI','click','http://www.gfi.com/?adv=149&amp;loc=5']);" href="http://www.gfi.com/?adv=149&amp;loc=5" target="_blank">GFI.com</a> <a href="http://www.packetlife.net" target="_blank">Packetlife.net</a>, <a href="http://hackingcisco.blogspot.com/" target="_blank">HackingCisco</a>, <a href="http://www.fryguy.net/" target="_blank">Fryguy's Blog</a>, <a href="http://www.sunpenguin.net" target="_blank">CCIE Journey</a>, <a href="http://clixtrac.com/goto/?90398" target="_blank">Colasoft</a>, <a href="/recommended-websites.html">More Recommended Websites</a><a href="http://www.sunpenguin.net" target="_blank"><br /></a></span></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<p style="text-align: center;">© Copyright 2000-2011 Firewall.cx - All Rights Reserved<br />Information and images contained on this site is copyrighted material.<br /><br />Firewall.cx - Cisco IP Networking, VPN - IPSec, Security, Cisco Switching, Cisco Routers, Cisco VoIP- CallManager Express &amp; UC500, Linux Administration</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="page-footer">
+<div class="wrapper floatholder">
+<div id="debug">
+<a class="anchor" href="#page">&nbsp;</a>
+</div>
+</div>
+</div>
+<a style="text-decoration:none;z-index:999999;" 
+href="http://www.firewall.cx/index.php?option=com_contact_enhanced&amp;view=contact&amp;id=1&amp;content_title=Nzc4OGE5ZGZkZVZFTlFJRWhsWVdSbGNpQk1aVzVuZEdnZ1FXNWhiSGx6YVhNZ0xTQlRaV04wYVc5dUlETT0=&amp;content_url=MjZlYWQxMmE4MWFIUjBjRG92TDNkM2R5NW1hWEpsZDJGc2JDNWplQzluWlc1bGNtRnNMWFJ2Y0dsamN5MXlaWFpwWlhkekwyWnlaV1V0YzJWamRYSnBkSGt0YzJWeWRtbGpaWE12TVRNMUxYUmpjQzFvWldGa1pYSXRZVzVoYkhsemFYTXVhSFJ0YkQ4PQ==&amp;tmpl=component" 
+class="modal cefeedback" 
+rel="{handler: 'iframe', size: {x:800, y:480}}"
+title="Feedback"
+id="cefeedback">&nbsp;</a><!-- accelerated by www.farbfinal.de/jfinalizer --></body>
+</html>

@@ -1,0 +1,51 @@
+<project default="run">	
+	<target name="clean">
+		<delete dir="build" />
+	</target>
+	
+	<target name="compile" depends="clean">
+	        <mkdir dir="build/classes"/>
+	        <javac srcdir="src" destdir="build/classes"/>
+	</target>
+
+	<target name="jarindexserver" depends="compile">
+	        <mkdir dir="build/jar"/>
+	        <jar destfile="build/jar/IndexServer.jar" basedir="build/classes">
+	            <manifest>
+	                <attribute name="Main-Class" value="com.aos.indexing.IndexingServer"/>
+	            </manifest>
+	        </jar>
+	</target>
+
+	<target name="runindexserver" depends="jarindexserver">
+		        <java jar="build/jar/IndexServer.jar" fork="true"/>
+	</target>
+
+	<target name="jarfileserver" depends="compile">
+	        <mkdir dir="build/jar"/>
+	        <jar destfile="build/jar/FileServer.jar" basedir="build/classes">
+	            <manifest>
+	                <attribute name="Main-Class" value="com.aos.server.FileServer"/>
+	            </manifest>
+	        </jar>
+	</target>
+
+	<target name="runfileserver" depends="jarfileserver">
+		        <java jar="build/jar/FileServer.jar" fork="true"/>
+	</target>
+
+
+	<target name="jarclient" depends="compile">
+		        <mkdir dir="build/jar"/>
+		        <jar destfile="build/jar/Client.jar" basedir="build/classes">
+		            <manifest>
+		                <attribute name="Main-Class" value="com.aos.client.ClientUtil"/>
+		            </manifest>
+		        </jar>
+	</target>
+
+	<target name="runclient" depends="jarclient">
+	        <java jar="build/jar/Client.jar" fork="true"/>
+	</target>
+
+</project>

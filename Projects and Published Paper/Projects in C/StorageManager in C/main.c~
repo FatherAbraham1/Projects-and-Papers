@@ -1,0 +1,158 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include "storage_mgr.h"
+int mainMenu();
+int manipulateMenu();
+int readMenu();
+int writeMenu();
+char* inputFileName();
+
+SM_PageHandle memPage;
+SM_FileHandle sm_FileHandle;
+
+int main(){
+	mainMenu();
+	return 0;
+}
+
+int mainMenu(){
+	int choice;
+	do{
+		printf("STORAGE MANAGER MAIN MENU\n");
+		printf("Please select an option from menu given below: \n");
+		printf("1. Maniulating page file\n");
+		printf("2. Read from disk\n");
+		printf("3. Write to disk\n");
+		printf("4. Exit\n");
+		printf("Enter your choice: ");
+	
+		scanf("%d",&choice);
+
+		switch(choice){
+			case 1:
+				manipulateMenu();
+				break;
+			case 2:
+				readMenu();
+				break;
+			case 3:
+				writeMenu();
+				break;
+			case 4:
+				printf("THANK YOU!");
+				exit(0);
+			default:
+				printf("Sorry! Not a valid choice.\n");
+		};
+	}while(choice!=4);
+}
+
+int manipulateMenu(){
+	int manipulateChoice,RC;
+	char *fileName;
+	do{	
+		printf("FILE MANIPULATION MENU\n");
+		printf("1. Create page file\t\t2. Open page file\n");
+		printf("3. Close page file\t\t4. Destroy page file\n");
+		printf("5. Return to main menu\t\t6. Exit\n");
+		printf("Enter your choice: ");
+		scanf("%d",&manipulateChoice);
+		switch(manipulateChoice){
+		case 1:		
+			fileName=inputFileName();
+			RC=createPageFile(fileName);
+			break;
+		case 2:
+			fileName=inputFileName();
+			RC=openPageFile(fileName,&sm_FileHandle);
+			break;
+		case 3:
+			RC=closePageFile(&sm_FileHandle);
+			break;
+		case 4:
+			fileName=inputFileName();
+			destroyPageFile(fileName);
+			break;
+		case 5:
+			mainMenu();
+			break;
+		case 6: 
+			exit(0);	
+		default:
+			printf("Sorry! Not a valid choice.\n");
+		};
+	}while(manipulateChoice!=6);
+}
+int readMenu(){
+	int readChoice;
+	do{
+		printf("WRITE MENU\n");
+		printf("1. Block position\t\t2. Read first block\n");
+		printf("3. Read previous block\t\t4. Read current block\n");
+		printf("5. Read next block\t\t6. Read last block\n");
+		printf("7. Return to main menu\t\t8. Exit\n");
+		printf("Enter your choice: ");
+		scanf("%d",&readChoice);
+	
+		switch(readChoice){
+		case 1:
+			getBlockPos(&sm_FileHandle);
+			break;
+		case 2:
+			readFirstBlock (&sm_FileHandle, memPage);
+			break;
+		case 3:
+			readPreviousBlock (&sm_FileHandle, memPage);
+			break;
+		case 4:
+			readCurrentBlock (&sm_FileHandle, memPage);
+			break;
+		case 5:
+			readNextBlock (&sm_FileHandle, memPage);
+			break;
+		case 6:
+			readLastBlock (&sm_FileHandle, memPage);
+			break;
+		case 7:
+			mainMenu();
+			break;
+		case 8: 
+			exit(0);	
+		default:
+			printf("Sorry! Not a valid choice.\n");
+		};
+	}while(readChoice!=7);
+}
+
+int writeMenu(){
+	int writeChoice;
+	do{
+		printf("READ MENU\n");
+		printf("1. Write current block\t\t2. Append empty block\n");
+		printf("3. Return to main menu\t\t4. Exit\n");
+		printf("Enter your choice: ");
+		scanf("%d",&writeChoice);
+		switch(writeChoice){
+		case 1:
+			writeCurrentBlock (&sm_FileHandle, memPage);
+			break;
+		case 2:
+			appendEmptyBlock (&sm_FileHandle);
+			break;
+		case 3:
+			mainMenu();
+			break;
+		case 4: 
+			exit(0);
+		default:
+			printf("Sorry! Not a valid choice.\n");
+		};
+	}while(writeChoice!=3);
+}
+
+char* inputFileName(){
+	char fileName[20];
+	printf("Enter the file name: ");
+	scanf("%s",&fileName);
+	return fileName;
+}

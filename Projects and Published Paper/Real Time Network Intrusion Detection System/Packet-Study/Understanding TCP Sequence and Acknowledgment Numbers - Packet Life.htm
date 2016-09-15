@@ -1,0 +1,940 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Language" content="en-us" />
+  <title>Understanding TCP Sequence and Acknowledgment Numbers - Packet Life</title>
+  <link href="http://media.packetlife.net/css/base.css" rel="stylesheet" type="text/css" />
+  <link href="http://media.packetlife.net/css/normal.css" rel="stylesheet" type="text/css" />
+  <link rel="alternate" type="application/rss+xml" title="Latest Blog Posts" href="/blog/feed/" />
+  <link rel="alternate" type="application/rss+xml" title="Three-Year Delayed Blog Replay" href="/blog/feed/replay/" />
+  <link rel="alternate" type="application/rss+xml" title="Recent Comments for Understanding TCP Sequence and Acknowledgment Numbers" href="/blog/2010/jun/7/understanding-tcp-sequence-acknowledgment-numbers/feed/" />
+  <script type='text/javascript' src='http://partner.googleadservices.com/gampad/google_service.js'></script>
+  <script type='text/javascript'>
+  GS_googleAddAdSenseService("ca-pub-8592253979949884");
+  GS_googleEnableAllServices();
+  </script>
+  <script type='text/javascript'>
+  GA_googleAddSlot("ca-pub-8592253979949884", "PacketLife_Blog_Top_728x90");
+  </script>
+  <script type='text/javascript'>
+  GA_googleFetchAds();
+  </script>
+  <script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3943290-1']);
+  _gaq.push(['_setDomainName', 'none']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+  </script>
+  <script type="text/javascript" src="http://media.packetlife.net/js/jquery.js"></script>
+  <script type="text/javascript" src="http://media.packetlife.net/js/misc.js"></script>
+  <script type="text/javascript">
+  </script>
+</head>
+<body>
+<div id="page_wrapper">
+<div id="top_border"></div>
+
+<div id="header">
+  <div id="user_info">
+  
+  Welcome, Guest! | <a href="https://packetlife.net/users/login/">Log in</a> | <a href="https://packetlife.net/users/register/">Register</a>
+  
+  </div>
+  <div id="search">
+    <form action="/search/" method="get">
+    <input type="text" name="q" value="Search" class="_hide_initial text"/><input type="image" src="http://media.packetlife.net/images/icons/24x24/search.png" class="button" />
+    </form>
+  </div>
+  <a href="/"><img src="http://media.packetlife.net/images/layout/logo.png" id="logo" width="488" height="80" alt="PacketLife.net logo" /></a>
+</div>
+<div class="clear"></div>
+
+
+
+<div id="page">
+  <div id="navigation">
+    <ul><li class="active"><a href="/blog/">Blog</a></li><li><a href="/wiki/">Wiki</a></li><li><a href="/lab/">Lab</a></li><li><a href="/forums/">Forums</a></li><li><a href="/captures/">Captures</a></li><li><a href="/armory/">Armory</a></li><li><a href="/posters/">Posters</a></li><li><a href="/library/">Library</a></li><li><a href="/toolbox/">Toolbox</a></li><li><a href="/bookshelf/">Bookshelf</a></li></ul>
+  </div>
+  <div id="navigation2">
+    <ul><li><a href="/blog/">Latest Entries</a></li><li><a href="/blog/archive/">Archive</a></li><li class="last"><a href="/forums/suggest-blog-topic/">Suggest a Topic</a></li></ul>
+  </div>
+  <div id="main">
+    
+
+<ul class="bold free-float-right link-blocks">
+<li><a href="?pdf" rel="nofollow" class="icon icon-pdf">Download as PDF</a></li>
+
+</ul>
+
+<div class="ad align-center clear" id="adsense">
+<!-- PacketLife_Blog_Top_728x90 -->
+<script type='text/javascript'>
+GA_googleFillSlot("PacketLife_Blog_Top_728x90");
+</script>
+</div>
+<!-- google_ad_section_start -->
+
+
+
+<div class="article">
+  <h1 class="title"><a href="/blog/2010/jun/7/understanding-tcp-sequence-acknowledgment-numbers/">Understanding TCP Sequence and Acknowledgment Numbers</a></h1>
+  <div class="byline">By <a href="/users/stretch/">stretch</a> | Monday, June 7, 2010 at 2:15 a.m. UTC</div>
+  <div class="body"><div><p>If you're reading this, odds are that you're already familiar with TCP's infamous "three-way handshake," or "SYN, SYN/ACK, ACK." Unfortunately, that's where TCP education ends for many networkers. Despite its age, TCP is a relatively complex protocol and well worth knowing intimately. This article aims to help you become more comfortable examining TCP sequence and acknowledgement numbers in the <a href="http://www.wireshark.org/">Wireshark</a> packet analyzer.</p>
+<p>Before we start, be sure to open <a href="http://media.packetlife.net/media/blog/attachments/424/TCP_example.cap">the example capture</a> in Wireshark and play along.</p>
+<p>The example capture contains a single HTTP request to a web server, in which the client web browser requests a single image image file, and the server returns an HTTP/1.1 200 (OK) response which includes the file requested. You can right-click on any of the TCP packets within this capture and select <strong>Follow TCP Stream</strong> to open the raw contents of the TCP stream in a separate window for inspection. Traffic from the client is shown in red, and traffic from the server in blue.</p>
+<p><img src="http://media.packetlife.net/media/blog/attachments/425/follow_tcp_stream.png" alt="follow_tcp_stream.png" /></p>
+<!--break-->
+
+<h3 id="the-three-way-handshake">The Three-Way Handshake</h3>
+<p>TCP utilizes a number of flags, or 1-bit boolean fields, in its header to control the state of a connection. The three we're most interested in here are:</p>
+<ul><li><strong>SYN</strong> - (Synchronize) Initiates a connection</li>
+<li><strong>FIN</strong> - (Final) Cleanly terminates a connection</li>
+<li><strong>ACK</strong> - Acknowledges received data</li>
+</ul><p>As we'll see, a packet can have multiple flags set.</p>
+<p>Select packet #1 in Wireshark and expand the TCP layer analysis in the middle pane, and further expand the "Flags" field within the TCP header. Here we can see all of the TCP flags broken down. Note that the SYN flag is on (set to 1).</p>
+<p><img src="http://media.packetlife.net/media/blog/attachments/426/tcp_syn.png" alt="tcp_syn.png" /></p>
+<p>Now do the same for packet #2. Notice that it has two flags set: ACK to acknowledge the receipt of the client's SYN packet, and SYN to indicate that the server also wishes to establish a TCP connection.</p>
+<p><img src="http://media.packetlife.net/media/blog/attachments/427/tcp_synack.png" alt="tcp_synack.png" /></p>
+<p>Packet #3, from the client, has only the ACK flag set. These three packets complete the initial TCP three-way handshake.</p>
+<h3 id="sequence-and-acknowledgment-numbers">Sequence and Acknowledgment Numbers</h3>
+<p>The client on either side of a TCP session maintains a 32-bit <em>sequence number</em> it uses to keep track of how much data it has sent. This sequence number is included on each transmitted packet, and acknowledged by the opposite host as an <em>acknowledgement number</em> to inform the sending host that the transmitted data was received successfully.</p>
+<p>When a host initiates a TCP session, its initial sequence number is effectively random; it may be any value between 0 and 4,294,967,295, inclusive. However, protocol analyzers like Wireshark will typically display <em>relative</em> sequence and acknowledgement number in place of the field's actual value. These values are relative to the initial sequence number of that stream. This is handy, as it is much easier to keep track of relatively small, predictable numbers rather than the actual numbers sent on the wire.</p>
+<p>For example, the initial relative sequence number shown in packet #1 is 0 (naturally), while the ASCII decode in the third pane shows that the actual sequence number is 0xf61c6cbe, or 4129057982 decimal.</p>
+<p><img src="http://media.packetlife.net/media/blog/attachments/428/relative_sequence_numbers.png" alt="relative_sequence_numbers.png" /></p>
+<p>The display of relative sequence numbers can optionally be disabled by navigating to <strong>Edit &gt; Preferences...</strong> and un-checking <strong>Relative sequence numbers and window scaling</strong> under TCP protocol preferences. However, be aware that the remainder of this article will reference relative sequence and acknowledgement numbers only.</p>
+<p>To better understand how sequence and acknowledgement numbers are used throughout the duration of a TCP session, we can utilize Wireshark's built-in flow graphing ability. Navigate to <strong>Statistics &gt; Flow Graph...</strong>, select <strong>TCP flow</strong> and click <strong>OK</strong>. Wireshark automatically builds a graphical summary of the TCP flow.</p>
+<p><img src="http://media.packetlife.net/media/blog/attachments/429/tcp_flow.png" alt="tcp_flow.png" /></p>
+<p>Each row represents a single TCP packet. The left column indicates the direction of the packet, TCP ports, segment length, and the flag(s) set. The column at right lists the relative sequence and acknowledgement numbers in decimal. Selecting a row in this column also highlights the corresponding packet in the main window.</p>
+<p>We can use this flow graph to better understand how sequence and acknowledgement numbers work.</p>
+<h4 id="packet-1">Packet #1</h4>
+<p>Each side of a TCP session starts out with a (relative) sequence number of zero. Likewise, the acknowledgement number is also zero, as there is not yet a complementary side of the conversation to acknowledge.</p>
+<p>(Note: The version of Wireshark used for this demonstration, 1.2.7, shows the acknowledgement number as an apparently random number. This believed to be a software bug; the initial acknowledgement number of a session should always be zero, as you can see from inspecting the hex dump of the packet.)</p>
+<h4 id="packet-2">Packet #2</h4>
+<p>The server responds to the client with a sequence number of zero, as this is its first packet in this TCP session, and a relative acknowledgement number of 1. The acknowledgement number is set to 1 to indicate the receipt of the client's SYN flag in packet #1.</p>
+<p>Notice that the acknowledgement number has been increased by 1 although no payload data has yet been sent by the client. This is because the presence of the SYN or FIN flag in a received packet triggers an increase of 1 in the sequence. (This does not interfere with the accounting of payload data, because packets with the SYN or FIN flag set do not carry a payload.)</p>
+<h4 id="packet-3">Packet #3</h4>
+<p>Like in packet #2, the client responds to the server's sequence number of zero with an acknowledgement number of 1. The client includes its own sequence number of 1 (incremented from zero because of the SYN).</p>
+<p>At this point, the sequence number for both hosts is 1. This initial increment of 1 on both hosts' sequence numbers occurs during the establishment of all TCP sessions.</p>
+<h4 id="packet-4">Packet #4</h4>
+<p>This is the first packet in the stream which carries an actual payload (specifically, the client's HTTP request). The sequence number is left at 1, since no data has been transmitted since the last packet in this stream. The acknowledgement number is also left at 1, since no data has been received from the server, either.</p>
+<p>Note that this packet's payload is 725 bytes in length.</p>
+<h4 id="packet-5">Packet #5</h4>
+<p>This packet is sent by the server solely to acknowledge the data sent by the client in packet #4 while upper layers process the HTTP request. Notice that the acknowledgement number has increased by 725 (the length of the payload in packet #4) to 726; e.g., "I have received 726 bytes so far." The server's sequence number remains at 1.</p>
+<h4 id="packet-6">Packet #6</h4>
+<p>This packet marks the beginning of the server's HTTP response. Its sequence number is still 1, since none of its packets prior to this one have carried a payload. This packet carries a payload of 1448 bytes.</p>
+<h4 id="packet-7">Packet #7</h4>
+<p>The sequence number of the client has been increased to 726 because of the last packet it sent. Having received 1448 bytes of data from the server, the client increases its acknowledgement number from 1 to 1449.</p>
+<p>For the majority of the capture, we will see this cycle repeat. The client's sequence number will remain steady at 726, because it has no data to transmit beyond the initial 725 byte request. The server's sequence number, in contrast, continues to grow as it sends more segments of the HTTP response.</p>
+<h3 id="tear-down">Tear-down</h3>
+<h4 id="packet-38">Packet #38</h4>
+<p>After acknowledging the last segment of data from the server, the client processes the HTTP response as a whole and decides no further communication is needed. Packet #38 is sent by the client with the FIN flag set. Its acknowledgement number remains the same as in the prior packet (#37).</p>
+<h4 id="packet-39">Packet #39</h4>
+<p>The server acknowledges the client's desire to terminate the connection by increasing the acknowledgement number by one (similar to what was done in packet #2 to acknowledge the SYN flag) and setting the FIN flag as well.</p>
+<h4 id="packet-40">Packet #40</h4>
+<p>The client sends its final sequence number of 727, and acknowledges the server's FIN packet by incrementing the acknowledgement number by 1 to 22952.</p>
+<p>At this point, both hosts have terminated the session and can release the software resources dedicated to its maintenance.</p></div></div>
+  <div class="author">
+    
+    <a href="/users/stretch/"><img src="http://media.packetlife.net/media/users/images/tn_stretch.jpg" height="" width="" class="float-left pic" /></a>
+    <h3>About the Author</h3>
+    <p>Jeremy Stretch is a networking engineer and the maintainer of PacketLife.net. He currently lives in Fairfax, Virginia, on the edge of the Washington, DC metro area. Although primarily an R&amp;S guy, he likes to get into everything, and runs a <a href="/lab/">free network training lab</a> out of his basement for fun. You can contact him by <a href="/contact/">email</a> or follow him on <a href="http://twitter.com/#!/packetlife">Twitter</a>.</p>
+    
+    <div class="clear"></div>
+  </div>
+  <div class="footer">
+    <div class="align-right">Posted in <a href="/blog/category/packet-analysis/">Packet Analysis</a></div>
+  </div>
+</div>
+
+
+
+<div class="colc70">
+
+<h2><a name="comments">Comments</a></h2>
+<div class="object_list">
+
+  <!--odd-->
+  
+<a name="c2782"></a>
+<div class="comment odd">
+
+<div class="byline">
+
+  <a href="http://hype-free.blogspot.com/">
+  Cd-MaN (guest)
+  </a>
+
+commented on Monday, June 7, 2010 at 4:39 a.m. UTC
+</div>
+<div class="body"><div><p>Fun fact: the 3-way hanshake can be in fact a four way handshake - see here (although I don't believe that it is implemented like that anywhere):</p>
+<p><a href="http://www.breakingpointsystems.com/community/blog/tcp-portals-the-handshakes-a-lie/">http://www.breakingpointsystems.com/community/blog/tcp-portals-the-handshakes-a-lie/</a></p></div></div>
+</div>
+
+  <!--even-->
+  
+<a name="c2784"></a>
+<div class="comment even">
+
+<div class="byline">
+
+  <a href="/users/eaadams/">eaadams</a>
+
+commented on Monday, June 7, 2010 at 8:38 a.m. UTC
+</div>
+<div class="body"><div><p>Great stuff Jeremy! Excellent explanation of TCP operation PLUS how to use Wireshark features to examine and learn about how a protocol works. Expect a flood of hits from my students!</p>
+<p>Aubrey</p></div></div>
+</div>
+
+  <!--odd-->
+  
+<a name="c2786"></a>
+<div class="comment odd">
+
+<div class="byline">
+
+  
+  Mimo (guest)
+  
+
+commented on Monday, June 7, 2010 at 3:27 p.m. UTC
+</div>
+<div class="body"><div><p>Hi Jeremy, </p>
+<p>Great article. </p>
+<p>When I studied TCP first, I was thought that ack no. is the next byte receiver is expecting.  i.e if ack no. is 726 that means, receiver received 725 bytes of data and sender can send data starting from 726th byte. </p>
+<p>So to me this sentence doesn't make much sense: </p>
+<p>"Notice that the acknowledgment number has been increased by 1 although no payload data has yet been sent by the client. This is because the presence of the SYN or FIN flag in a received packet triggers an increase of 1 in the sequence."</p>
+<p>As it seems to me that is is expecting data stream starting from byte 1. So Ack no. is not increased.</p>
+<p>Though the meaning is same.</p>
+<p>PS: Thank you for the demo of ability of wireshark. I still don't know much abt this tool.</p></div></div>
+</div>
+
+  <!--even-->
+  
+<a name="c2787"></a>
+<div class="comment even">
+
+<div class="byline">
+
+  <a href="/users/stretch/">stretch</a>
+
+commented on Monday, June 7, 2010 at 5:02 p.m. UTC
+</div>
+<div class="body"><div><p>@Mimo: In this instance, as is typical with network protocols in general, our counter is <em>zero-indexed</em>; the first byte is byte 0, not byte 1. the SYN flag increases the counter by one to 1, which is actually the second possible value.</p>
+<p>Hope that helps.</p></div></div>
+</div>
+
+  <!--odd-->
+  
+<a name="c2789"></a>
+<div class="comment odd">
+
+<div class="byline">
+
+  
+  yohan900 (guest)
+  
+
+commented on Tuesday, June 8, 2010 at 12:13 a.m. UTC
+</div>
+<div class="body"><div><p>Mimo, you are correct.  Do a search on google for TCP phantom byte and that will explain why there is an increment of 1 in the setup and teardown processes.</p>
+<p>Also check out Laura Chappells WireShark training, good stuff.</p>
+<p>http://support.novell.com/techcenter/articles/nc2001_05e.html</p>
+<p>Note. During the TCP startup and teardown sequence, a "phantom byte" causes the sequence number and acknowledgment number fields to increment by 1 even though no data is exchanged. This phantom byte can be confusing when you have just learned that the sequence number field increments only when data is sent.</p></div></div>
+</div>
+
+  <!--even-->
+  
+<a name="c2790"></a>
+<div class="comment even">
+
+<div class="byline">
+
+  <a href="http://www.arkf.net/blog/">
+  tormentum (guest)
+  </a>
+
+commented on Tuesday, June 8, 2010 at 12:51 a.m. UTC
+</div>
+<div class="body"><div><p>G'day,</p>
+<p>Great post!  I've just recently started down the road to CCNA having always been interested in networking.  I've used wireshark in the past for very basic troubleshooting, but this is a nice deep (comparitivley speaking!) look at TCP.<br></p>
+<p>One question:  packet 36 contains a PSH or push flag.  What is this in relation to the HTTP stream?</p>
+<p>Cheers,<br>
+Adam.</p></div></div>
+</div>
+
+  <!--odd-->
+  
+<a name="c2792"></a>
+<div class="comment odd">
+
+<div class="byline">
+
+  
+  Mimo (guest)
+  
+
+commented on Tuesday, June 8, 2010 at 3:00 p.m. UTC
+</div>
+<div class="body"><div><p>Thank you yohan900 and stretch for the information!! </p>
+<p>@ tormentum<br><a href="http://support.microsoft.com/kb/169292">http://support.microsoft.com/kb/169292</a><br>
+If the PUSH bit set, data will be delivered up to the application right away, but the ack may still be delayed. </p>
+<p>Hope this helps....</p></div></div>
+</div>
+
+  <!--even-->
+  
+<a name="c2794"></a>
+<div class="comment even">
+
+<div class="byline">
+
+  
+  Daren (guest)
+  
+
+commented on Wednesday, June 9, 2010 at 7:49 a.m. UTC
+</div>
+<div class="body"><p>What a bit of luck!!!  I have a second-stage telephone interview today and one of the subjects I will be tested on is TCP.  The first interview covered it in a little detail (3-way handshake / sliding window) but this one today will delve further into it.  This will help enormously - thank you very much Jeremy.</p></div>
+</div>
+
+  <!--odd-->
+  
+<a name="c2796"></a>
+<div class="comment odd">
+
+<div class="byline">
+
+  
+  Ned (guest)
+  
+
+commented on Wednesday, June 9, 2010 at 7:01 p.m. UTC
+</div>
+<div class="body"><p>Hi Jeremy, Nice Article. Thx for posting. If you get a chance can you continue on in this series and dive deeper into TCP with regards to the various algorithms like slow start and other concepts like windowing, congestion control, PAWS, Reno, SACKs etc. Tx</p></div>
+</div>
+
+  <!--even-->
+  
+<a name="c2797"></a>
+<div class="comment even">
+
+<div class="byline">
+
+  <a href="/users/AaronDhiman/">AaronDhiman</a>
+
+commented on Wednesday, June 9, 2010 at 7:21 p.m. UTC
+</div>
+<div class="body"><p>Awesome Article!</p></div>
+</div>
+
+  <!--odd-->
+  
+<a name="c2804"></a>
+<div class="comment odd">
+
+<div class="byline">
+
+  
+  Dano (guest)
+  
+
+commented on Thursday, June 10, 2010 at 6:18 p.m. UTC
+</div>
+<div class="body"><div><p>It would have been much better to call this a "Three-step handshake" or "Three-phase handshake".  To me, "Three-way handshake" implies that here are three different parties shaking hands when in fact it is a method that requires three steps for two parties to communicate.</p>
+<p>Just an observation . . </p></div></div>
+</div>
+
+  <!--even-->
+  
+<a name="c2819"></a>
+<div class="comment even">
+
+<div class="byline">
+
+  <a href="/users/ecbanks/">ecbanks</a>
+
+commented on Thursday, June 17, 2010 at 1:38 p.m. UTC
+</div>
+<div class="body"><p>Succinct explanation.  Helped straighten this out in my head.</p></div>
+</div>
+
+  <!--odd-->
+  
+<a name="c2869"></a>
+<div class="comment odd">
+
+<div class="byline">
+
+  <a href="http://raylook.blogspot.com/">
+  raylook (guest)
+  </a>
+
+commented on Thursday, July 1, 2010 at 3:21 p.m. UTC
+</div>
+<div class="body"><p>great article , thanks ;)</p></div>
+</div>
+
+  <!--even-->
+  
+<a name="c3519"></a>
+<div class="comment even">
+
+<div class="byline">
+
+  
+  Angelo (guest)
+  
+
+commented on Saturday, November 20, 2010 at 6:39 p.m. UTC
+</div>
+<div class="body"><div><p>Hi, 
+So if client is sending a data over different TCP segments the acknowledge number on client side will not increase untill all the data has been sent over..???</p>
+<p>I have a client which sends data to server and when I capture it I see the data is not in single IP datagram but I see that the whole data sent to server spans over multiple TCP segments and in Two IP datagrams. </p>
+<p>My questions is if I need to collect all the data sent by client to server how do I reassemble them at TCP lever. I am capturing IP packets which encapsulates TCP....</p>
+<p>Thanks,<br>
+Angelo</p></div></div>
+</div>
+
+  <!--odd-->
+  
+<a name="c3598"></a>
+<div class="comment odd">
+
+<div class="byline">
+
+  <a href="http://studyhacktivism.blogspot.com/">
+  natraj (guest)
+  </a>
+
+commented on Thursday, December 9, 2010 at 12:34 p.m. UTC
+</div>
+<div class="body"><div><p>Hi,<br>
+This is good stuff, but why didn't u talk about packet#36 and packet#37? If those are also added to this article, then this will be more useful for beginners. </p>
+<p>Thanks,</p>
+<p>Natraj. </p></div></div>
+</div>
+
+  <!--even-->
+  
+<a name="c4440"></a>
+<div class="comment even">
+
+<div class="byline">
+
+  
+  Wajih (guest)
+  
+
+commented on Monday, May 30, 2011 at 5:05 p.m. UTC
+</div>
+<div class="body"><p>Thanks indeed. God bless you!</p></div>
+</div>
+
+  <!--odd-->
+  
+<a name="c4459"></a>
+<div class="comment odd">
+
+<div class="byline">
+
+  
+  Taki (guest)
+  
+
+commented on Saturday, June 4, 2011 at 6:19 p.m. UTC
+</div>
+<div class="body"><div><p>Good tutorial, many thanks for it.</p>
+<p>Why does wireshark keep displaying len=0 for each tcp segment ?</p></div></div>
+</div>
+
+  <!--even-->
+  
+<a name="c4470"></a>
+<div class="comment even">
+
+<div class="byline">
+
+  
+  Himanshu (guest)
+  
+
+commented on Wednesday, June 8, 2011 at 8:10 p.m. UTC
+</div>
+<div class="body"><p>Itz really a nice work .<br>Good help for beginners.</p></div>
+</div>
+
+  <!--odd-->
+  
+<a name="c4670"></a>
+<div class="comment odd">
+
+<div class="byline">
+
+  
+  matti (guest)
+  
+
+commented on Friday, July 29, 2011 at 8:20 a.m. UTC
+</div>
+<div class="body"><div><p>A good explanation on TCP basics. Your decision to use relative numbers is clear, but I always tend to stick with actual numbers in the 3-way handshake part. This is to emphasize my students that both ends use their own, independent seq numbers that gets increased while data flow goes on. It's easy to mix them when both start from zero, as is the case with wireshark using relative seq numbers. </p>
+<p>Keep up the good work!</p></div></div>
+</div>
+
+  <!--even-->
+  
+<a name="c4919"></a>
+<div class="comment even">
+
+<div class="byline">
+
+  
+  Vijay  (guest)
+  
+
+commented on Tuesday, October 11, 2011 at 5:05 p.m. UTC
+</div>
+<div class="body"><div><p>Great Explanation !!! It cleared most of the doubts that I had. </p>
+<p>Earlier my assumption was the sequence number would be sequential and I did not know that Acknowledgement was related to the amount of bytes transferred. But you made it clear. Thanks a lot.</p></div></div>
+</div>
+
+  <!--odd-->
+  
+<a name="c4952"></a>
+<div class="comment odd">
+
+<div class="byline">
+
+  <a href="http://www.mkriesten.de/">
+  mkriesten (guest)
+  </a>
+
+commented on Thursday, October 27, 2011 at 11:18 a.m. UTC
+</div>
+<div class="body"><p>Excellent explanation. This article is a wonderful piece for educational purposes. Stumbled upon it yesterday while talking about TCP with one of my younger colleagues.</p></div>
+</div>
+
+  <!--even-->
+  
+<a name="c5002"></a>
+<div class="comment even">
+
+<div class="byline">
+
+  
+  jrreyes (guest)
+  
+
+commented on Tuesday, November 29, 2011 at 11:37 p.m. UTC
+</div>
+<div class="body"><p>Very clearly explained. Thank you !!!</p></div>
+</div>
+
+  <!--odd-->
+  
+<a name="c5017"></a>
+<div class="comment odd">
+
+<div class="byline">
+
+  
+  leffe (guest)
+  
+
+commented on Friday, December 9, 2011 at 9:06 p.m. UTC
+</div>
+<div class="body"><p>Thank you for this great explanation!</p></div>
+</div>
+
+  <!--even-->
+  
+<a name="c5028"></a>
+<div class="comment even">
+
+<div class="byline">
+
+  
+  A guest
+  
+
+commented on Tuesday, December 20, 2011 at 11:20 a.m. UTC
+</div>
+<div class="body"><p>Very good explained. Thanks a lot. Guys like you makes life easier for us.</p></div>
+</div>
+
+  <!--odd-->
+  
+<a name="c5113"></a>
+<div class="comment odd">
+
+<div class="byline">
+
+  
+  Amit Gupta (guest)
+  
+
+commented on Friday, January 27, 2012 at 4:27 a.m. UTC
+</div>
+<div class="body"><div><p>Excellent explanation. I was just hunting for this type of explanation on the complete cycle of TCP packet. Got more interest after reading this article.</p>
+<p>Thank you very much Jeremy. </p></div></div>
+</div>
+
+  <!--even-->
+  
+<a name="c5255"></a>
+<div class="comment even">
+
+<div class="byline">
+
+  <a href="/users/kr105/">kr105</a>
+
+commented on Saturday, March 24, 2012 at 8:12 p.m. UTC
+</div>
+<div class="body"><p>Awesome, thank you!!</p></div>
+</div>
+
+  <!--odd-->
+  
+<a name="c5349"></a>
+<div class="comment odd">
+
+<div class="byline">
+
+  
+  mani (guest)
+  
+
+commented on Friday, April 27, 2012 at 8:00 a.m. UTC
+</div>
+<div class="body"><p>its awesome man its great effort i really appreciate it good work it is very helpful   for beginners</p></div>
+</div>
+
+  <!--even-->
+  
+<a name="c5446"></a>
+<div class="comment even">
+
+<div class="byline">
+
+  
+  Zeo (guest)
+  
+
+commented on Wednesday, May 16, 2012 at 5:31 p.m. UTC
+</div>
+<div class="body"><div><p>Thank you Jeremy it is a great article!</p>
+<p>Looking at the connection termination:</p>
+<p>"The server acknowledges the client's desire to terminate the connection by increasing the acknowledgement number by one (similar to what was done in packet #2 to acknowledge the SYN flag) and setting the FIN flag as well."</p>
+<p>Please share your thoughts on this because I thought that the ACK and FIN can not be combined in the same segment because the the server might still be processing a transaction and not ready to close yet so it waits until it finishes processing those transactions before setting FIN flag.  Thus it is a  way hand shake when tearing down a connection. </p></div></div>
+</div>
+
+  <!--odd-->
+  
+<a name="c5456"></a>
+<div class="comment odd">
+
+<div class="byline">
+
+  
+  Joe (guest)
+  
+
+commented on Monday, May 21, 2012 at 7:02 p.m. UTC
+</div>
+<div class="body"><p>Wow, I've been looking for a simple explanation like this for the last week, thank you so much!!!!</p></div>
+</div>
+
+  <!--even-->
+  
+<a name="c5458"></a>
+<div class="comment even">
+
+<div class="byline">
+
+  
+  Mitchell (guest)
+  
+
+commented on Wednesday, May 23, 2012 at 3:17 p.m. UTC
+</div>
+<div class="body"><div><p>Hi, thanks for this great tutorial, have an exam in a few days and this had made things a lot clearer although realy, I didn't need to go this much is depth.</p>
+<p>Thank you.</p></div></div>
+</div>
+
+  <!--odd-->
+  
+<a name="c5475"></a>
+<div class="comment odd">
+
+<div class="byline">
+
+  <a href="http://www.jamesgoulding.com/">
+  James Goulding (guest)
+  </a>
+
+commented on Tuesday, May 29, 2012 at 12:01 a.m. UTC
+</div>
+<div class="body"><div><p>After a zillion sites I finally understand the concept of ACK numbers. Your step by step break down of the diagram was key for me. Note: I'm going to a very well-known University and none of their material explains this concept like you have done. </p>
+<p>The following was what did it for me: <br>"Packet #: 7 The sequence number of the client has been increased to 726 because of the last packet it sent. Having received 1448 bytes of data from the server, the client increases its acknowledgement number from 1 to 1449.</p>
+<p>For the majority of the capture, we will see this cycle repeat. The client's sequence number will remain steady at 726, because it has no data to transmit beyond the initial 725 byte request. The server's sequence number, in contrast, continues to grow as it sends more segments of the HTTP response." </p>
+<p>I realized that the server could send more than the client requested. We were asked to break down 8 packets into a diagram and explain their movements, in Wireshark, with several criteria. In ALL of their examples the server NEVER sent more data. After 3 hours I was ready to blow. </p>
+<p>Thanks for your posting. </p></div></div>
+</div>
+
+  <!--even-->
+  
+<a name="c5568"></a>
+<div class="comment even">
+
+<div class="byline">
+
+  
+  Student (guest)
+  
+
+commented on Monday, July 2, 2012 at 1:41 a.m. UTC
+</div>
+<div class="body"><p>Thank you for the explanation and visuals on WireShark!  Made understanding TCP/IP a lot easier!</p></div>
+</div>
+
+  <!--odd-->
+  
+<a name="c5608"></a>
+<div class="comment odd">
+
+<div class="byline">
+
+  
+  Heshan (guest)
+  
+
+commented on Friday, July 20, 2012 at 10:51 a.m. UTC
+</div>
+<div class="body"><p>Thank you very much! A great explanation.</p></div>
+</div>
+
+  <!--even-->
+  
+<a name="c5618"></a>
+<div class="comment even">
+
+<div class="byline">
+
+  
+  A guest
+  
+
+commented on Monday, July 30, 2012 at 1:58 p.m. UTC
+</div>
+<div class="body"><p>Thanks, It was very useful for me.</p></div>
+</div>
+
+  <!--odd-->
+  
+<a name="c5627"></a>
+<div class="comment odd">
+
+<div class="byline">
+
+  
+  Novin Mathew (guest)
+  
+
+commented on Friday, August 3, 2012 at 1:17 p.m. UTC
+</div>
+<div class="body"><p>Jeremy, Good one! A quick insight into few important TCP/IP internals. Really helpful.<br>Cheers, Novin</p></div>
+</div>
+
+  <!--even-->
+  
+<a name="c5651"></a>
+<div class="comment even">
+
+<div class="byline">
+
+  
+  Ondrej (guest)
+  
+
+commented on Sunday, August 26, 2012 at 11:09 a.m. UTC
+</div>
+<div class="body"><p>Amazing, thank you so much. I've been looking for explanation like this for ages. Cool stuff, keep up on your great work!</p></div>
+</div>
+
+  <!--odd-->
+  
+<a name="c5652"></a>
+<div class="comment odd">
+
+<div class="byline">
+
+  
+  Suryakanta Mandal (guest)
+  
+
+commented on Monday, August 27, 2012 at 8:53 a.m. UTC
+</div>
+<div class="body"><p>Great stuff Explained very well</p></div>
+</div>
+
+  <!--even-->
+  
+<a name="c5717"></a>
+<div class="comment even">
+
+<div class="byline">
+
+  
+  Mohsen (guest)
+  
+
+commented on Monday, September 17, 2012 at 3:23 p.m. UTC
+</div>
+<div class="body"><div><p>Thanks, this gives an intuitive understanding of TCP/IP.</p>
+<p>Thanks<br>Regards<br>Mohsen hs</p></div></div>
+</div>
+
+  <!--odd-->
+  
+<a name="c5718"></a>
+<div class="comment odd">
+
+<div class="byline">
+
+  
+  sam (guest)
+  
+
+commented on Monday, September 17, 2012 at 4:24 p.m. UTC
+</div>
+<div class="body"><p>Wonderful information, Thanks</p></div>
+</div>
+
+  <!--even-->
+  
+<a name="c5721"></a>
+<div class="comment even last">
+
+<div class="byline">
+
+  
+  SteveO (guest)
+  
+
+commented on Wednesday, September 19, 2012 at 1:51 a.m. UTC
+</div>
+<div class="body"><p>Difficult to find a document like this. Cisco needs to hire you to write this in their books! This will always help me and others. </p></div>
+</div>
+
+</div>
+
+
+
+<!-- google_ad_section_end -->
+<h3><a name="add-comment">Leave a Comment</a></h3>
+<form action="#add-comment" method="post">
+<table class="form">
+
+
+
+  
+  
+    <tr>
+      <th><label>Guest name</label></th>
+      <td>
+        
+        <input id="id_guest_name" type="text" class="text short" name="guest_name" maxlength="50" />
+        <br /><span class="help_text"><a href="/users/register/">Register</a> to comment as a member. You'll look cooler.</span>
+      </td>
+    </tr>
+  
+
+  
+  
+    <tr>
+      <th><label>Guest email</label></th>
+      <td>
+        
+        <input id="id_guest_email" type="text" class="text" name="guest_email" maxlength="75" />
+        <br /><span class="help_text">Optional; will not be displayed publicly or given out.</span>
+      </td>
+    </tr>
+  
+
+  
+  
+    <tr>
+      <th><label>Guest URL</label></th>
+      <td>
+        
+        <input id="id_guest_url" type="text" class="text" name="guest_url" maxlength="200" />
+        <br /><span class="help_text"><strong>No commercial links.</strong> Only personal (e.g. blog, Twitter, or LinkedIn) and/or on-topic links, please.</span>
+      </td>
+    </tr>
+  
+
+  
+  
+    <tr>
+      <td colspan="2" class="align-center">
+        
+        <textarea id="id_text" rows="10" cols="40" name="text" class="required short _markup"></textarea>
+        
+      </td>
+    </tr>
+  
+
+  
+  
+    <tr>
+      <th><label class="bold">Challenge</label></th>
+      <td>
+        
+        <input id="id_challenge_0" type="hidden" name="challenge_0" value="2981642" class="required" />
+<span>How many layers does the OSI model contain?</span><br />
+<input id="id_challenge_1" type="text" name="challenge_1" class="required" />
+        
+      </td>
+    </tr>
+  
+
+
+
+<tr><td colspan="2" class="buttons">
+<input type="submit" name="action" value="Save" />
+<input type="submit" name="action" value="Preview" />
+<input type="button" value="Cancel" onclick="parent.location='/blog/2010/jun/7/understanding-tcp-sequence-acknowledgment-numbers/'" />
+</td></tr>
+</table>
+</form>
+
+</div>
+
+
+    <div class="clear"></div>
+  </div>
+</div>
+<div id="page_end"></div>
+
+<div id="clearfooter"></div>
+</div>
+
+<div id="footer">
+  <div id="footer1" class="align-center">
+    <ul><li><a href="/">Main</a></li><li><a href="/blog/">Blog</a></li><li><a href="/wiki/">Wiki</a></li><li><a href="/lab/">Lab</a></li><li><a href="/forums/">Forums</a></li><li><a href="/captures/">Captures</a></li><li><a href="/armory/">Armory</a></li><li><a href="/posters/">Posters</a></li><li><a href="/library/">Library</a></li><li><a href="/toolbox/">Toolbox</a></li><li class="last"><a href="/bookshelf/">Bookshelf</a></li></ul>
+  </div>
+  <div id="footer2">
+    <div id="footer2_inside">
+    <div class="line_header">Friends</div><div><a href="http://networking-forum.com/">networking-forum.com</a> &middot; <a href="http://inetpro.org/wiki/">Internetworkpro</a> &middot; <a href="http://firewall.cx/">firewall.cx</a> &middot; <a href="http://www.reddit.com/r/networking/">r/Networking</a></div>
+    <div class="line_header">Other Stuff</div><div><a href="/wiki/about-packet-life/">About</a> &middot; <a href="/contact/">Admin contact</a> &middot; <a href="/privacy/">Privacy Policy</a> &middot; <a href="/advertise/">Advertise</a> &middot; <a href="/stats/">Stats</a> &middot; <a href="irc://irc.freenode.net/packetlife">#packetlife (Freenode)</a> &middot; <a href="http://twitter.com/#!/packetlife">@packetlife</a></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

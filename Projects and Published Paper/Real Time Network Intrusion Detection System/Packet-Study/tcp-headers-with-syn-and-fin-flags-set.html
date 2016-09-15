@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>TCP Headers with SYN and FIN Flags Set - JUNOS Software Security Configuration Guide</title>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+<link media="screen" type="text/css" href="/techpubs/images/standard.css" rel="StyleSheet">
+</head>
+<body bgcolor="#ffffff">
+[
+				<a href="junos-es-swconfig-security-TOC.html">Contents</a>]
+[
+				<a href="understanding-operating-system-probes.html">Prev</a>]
+[
+				<a href="tcp-headers-with-fin-flag-and-without-ack-flag.html">Next</a>]
+				
+[
+					<a href="junos-es-swconfig-security-IX.html">Index</a>]
+				
+[
+				<a target="_blank" href="https://www.juniper.net/cgi-bin/docbugreport/">Report an Error</a>]
+				<hr>
+<a xmlns:atict="http://www.arbortext.com/namespace/atict" xmlns:l="http://docbook.sourceforge.net/xmlns/l10n/1.0" name="id-36531"></a>
+<h1 xmlns:atict="http://www.arbortext.com/namespace/atict" xmlns:l="http://docbook.sourceforge.net/xmlns/l10n/1.0" class="Title">TCP Headers with SYN and FIN Flags Set</h1>
+<p xmlns:atict="http://www.arbortext.com/namespace/atict" xmlns:l="http://docbook.sourceforge.net/xmlns/l10n/1.0" class="Para1" align="left" state="authored" reusable="no" id="jN1AEFE">Both the SYN and FIN control flags are not normally
+set in the same TCP segment header. The SYN flag synchronizes sequence
+numbers to initiate a TCP connection. The FIN flag indicates the end
+of data transmission to finish a TCP connection. Their purposes are
+mutually exclusive. A TCP header with the SYN and FIN flags set is
+anomalous TCP behavior, causing various responses from the recipient,
+depending on the OS. See <a href="tcp-headers-with-syn-and-fin-flags-set.html#id-54162">Figure 31</a>.</p>
+<a xmlns:atict="http://www.arbortext.com/namespace/atict" xmlns:l="http://docbook.sourceforge.net/xmlns/l10n/1.0" name="id-54162"></a>
+<p xmlns:atict="http://www.arbortext.com/namespace/atict" xmlns:l="http://docbook.sourceforge.net/xmlns/l10n/1.0" class="SubTitleFigure">Figure 31: TCP Header with SYN and FIN Flags Set</p>
+<center xmlns:atict="http://www.arbortext.com/namespace/atict" xmlns:l="http://docbook.sourceforge.net/xmlns/l10n/1.0">
+<p class="Para1">
+<img alt="Image TCP_header_SYN-FIN.gif" src="/techpubs/images/TCP_header_SYN-FIN.gif"></p>
+</center>
+<p xmlns:atict="http://www.arbortext.com/namespace/atict" xmlns:l="http://docbook.sourceforge.net/xmlns/l10n/1.0" class="Para1" align="left" state="authored" reusable="no" id="jN1AF22">An attacker can send a segment with both flags
+set to see what kind of system reply is returned and thereby determine
+what kind of OS is on the receiving end. The attacker can then use
+any known system vulnerabilities for further attacks.</p>
+<p xmlns:atict="http://www.arbortext.com/namespace/atict" xmlns:l="http://docbook.sourceforge.net/xmlns/l10n/1.0" class="Para1" align="left" state="authored" reusable="no" id="jN1AF27">When you enable this SCREEN option, JUNOS software checks if the SYN and FIN flags are set in TCP headers. If
+it discovers such a header, it drops the packet.</p>
+<hr>
+[
+				<a href="junos-es-swconfig-security-TOC.html">Contents</a>]
+[
+				<a href="understanding-operating-system-probes.html">Prev</a>]
+[
+				<a href="tcp-headers-with-fin-flag-and-without-ack-flag.html">Next</a>]
+				
+[
+					<a href="junos-es-swconfig-security-IX.html">Index</a>]
+				
+[
+				<a target="_blank" href="https://www.juniper.net/cgi-bin/docbugreport/">Report an Error</a>]
+				<br>
+<br>
+<div class="footer" ALIGN="center">
+		
+<style type="text/css" media="screen">
+/* footer */
+#footer {background-color:#ffffff; padding:0px 21px; width:892px; height:25px; clear:both;line-height:25px;border-top:solid 1px #e4e4e4; float:left; margin-top:75px; font-size:10px !important; color:#919191;}
+.footerBottom {width:937px;height:0px;}
+#footer .fNav {margin-right:15px; float:left;}
+#footer .fNav a {color:#919191;}
+.fCopyRight {float:right; color:#919191;}
+.footerBottom {font-size:1px;}
+#footer .fNav, #footer .fCopyRight {font-size:11px;}
+</style>
+
+
+<!-- BEGIN footer20-techpubs.html from global assets/includes branch -->
+
+				<div class="seperator clear">
+
+					<!-- BEGIN FOOTER fragment
+					generated from:
+					http://jnet-dev-uat.juniper.net/fragment.do?type=FOOTER&refresh=true
+					02/12/2009
+					 -->
+					<div class="footer" id="footer">
+					<div class="fNav"><a title="Site Map" href="/us/en/site-map/">Site Map</a></div>
+					<div class="fNav"><a title="RSS Feeds" href="http://rss.juniper.net">RSS Feeds</a></div>
+					<div class="fNav"><a title="Careers" href="/us/en/company/careers/">Careers</a></div>
+					<div class="fNav"><a title="Accessibility" href="/us/en/accessibility/">Accessibility</a></div>
+
+					<div class="fNav"><a title="Feedback" href="/cgi-bin/feedback">Feedback</a></div>
+					<div class="fNav"><a title="Privacy &amp; Policy" href="/us/en/privacy-policy/">Privacy & Policy</a></div>
+					<div class="fNav"><a title="Legal Notices" href="/us/en/legal-notices/">Legal Notices</a></div>
+					<div class="fCopyRight">Copyright&copy;	1999-2010 Juniper Networks, Inc.</div>
+					</div>
+					<!-- END FOOTER fragment -->
+
+
+
+				</div><!-- closes div.separator and div.clear -->
+
+
+
+
+			<!-- BEGIN BAYNOTE OBSERVER CODE -->
+			<script type="text/javascript" src="/assets/js/baynote/baynote.js"></script>
+			<!-- END BAYNOTE OBSERVER CODE -->
+
+
+			<!-- BEGIN WEB TRENDS TRACKING CODE -->
+			<script src="/assets/js/webtrends.js" type="text/javascript"></script>
+			<script type="text/javascript">
+			var _tag=new WebTrends();
+			_tag.dcsGetId();
+			_tag.dcsCollect();
+			</script>
+
+			<noscript>
+			<div><img alt="DCSIMG" id="DCSIMG" width="1" height="1" src="https://statse.webtrendslive.com/dcsq7njin00000clw0vb9dfg3_6h4t/njs.gif?dcsuri=/nojavascript&amp;WT.js=No&amp;WT.tv=8.6.0"/></div>
+			</noscript>
+			<!-- END WEB TRENDS TRACKING CODE -->
+
+			<!--end any page specific analytics js injection -->
+
+<!-- END footer20-techpubs.html -->
+	</div>
+</body>
+</html>

@@ -1,0 +1,270 @@
+<html>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<head>
+<title>IP Packet Header</title>
+<link rel="STYLESHEET" type="text/css" href="images/style.css">
+<link rel="STYLESHEET" type="text/css" href="images/docsafari.css">
+</head>
+<body>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+<tr><td><div STYLE="MARGIN-LEFT: 0.15in;">
+<a href=ch01lev1sec1.html><img src="images/prev.gif" width="60" height="17" border="0" align="absmiddle" alt="Previous Page"></a>
+<td align="right"><div STYLE="MARGIN-LEFT: 0.15in;">
+<a href=ch01lev1sec3.html><img src="images/next.gif" width="60" height="17" border="0" align="absmiddle" alt="Next Page"></a>
+</div></td></tr></table>
+<br><table width="100%" border="0" cellspacing="0" cellpadding="0"><tr><TD valign="top"><a name="ch01lev1sec2"></a>
+<h3 class="docSection1Title">IP Packet Header</h3>
+<p class="docText"><a class="docLink" href="#ch01fig02">Figure 1-2</a> shows the format of the IP packet header, specified in RFC 791. Most fields in this packet have some importance to routing.</P>
+<a name="ch01fig02"></a><P><center>
+<h5 class="docFigureTitle">Figure 1-2. IP packet protocol.</H5>
+
+<p class="docText">
+<img border="0" alt="" width="500" height="282" SRC="images/01fig02.jpg"></P>
+
+</center></p><br>
+<p class="docText"><a name="idd1e1192"></a><a name="idd1e1198"></a><a name="idd1e1207"></a><a name="idd1e1216"></a><a name="idd1e1222"></a><a name="idd1e1228"></a><a name="idd1e1234"></a><a name="idd1e1238"></a><a name="idd1e1242"></a><a name="idd1e1251"></a><a name="idd1e1260"></a><a name="idd1e1264"></a><a name="idd1e1268"></a><a name="idd1e1272"></a><span class="docEmphasis">Version</span> identifies the IP version to which the packet belongs. This four-bit field is set to binary 0100 to indicate version 4 (IPv4) or binary 0110 to indicate version 6 (IPv6). This chapter is concerned primarily with IPv4, whereas <a class="docLink" href="ch02.html#ch02">Chapter 2</a>, &quot;IPv6 Overview,&quot; focuses on IPv6. <a class="docLink" href="#ch01table01">Table 1-1</a> shows all currently assigned version numbers, along with a few of the relevant RFCs. All versions other than 4 and 6 (built on an earlier proposal called Simple Internet Protocol, or SIP, which also carried a version number of 6) now exist only as &quot;culture,&quot; and it will be left to the curious to read their cited RFCs.</p>
+<a name="ch01table01"></a><p><table cellspacing="0" class="allBorders" border="1" RULES="groups" cellpadding="5"><caption><H5 class="docTableTitle">Table 1-1. IP version numbers.</h5></caption><colgroup><col width="125"><col width="300"><col width="75"></colgroup><thead><tr><th class="rightBorder bottomBorder thead" scope="col" align="left" valign="top"><p class="docText">Number</P></th><th class="rightBorder bottomBorder thead" scope="col" align="left" valign="top"><p class="docText">Version</p></th><th class="rightBorder bottomBorder thead" scope="col" align="left" valign="top"><p class="docText">RFC</p></th></TR></thead><TR><TD class="rightBorder" align="left" valign="top"><p class="docText">0</p></td><td class="rightBorder" align="left" valign="top"><p class="docText">Reserved</p></td><td class="docTableCell" align="left" valign="top">&nbsp;</td></tr><tr><td class="rightBorder" align="left" valign="top"><p class="docText">13</p></td><td class="rightBorder" align="left" valign="top"><p class="docText">Unassigned</p></td><TD class="docTableCell" align="left" valign="top">&nbsp;</TD></tr><tr><TD class="rightBorder" align="left" valign="top"><p class="docText">4</p></TD><td class="rightBorder" align="left" valign="top"><p class="docText">Internet Protocol version 4 (IPv4)</p></TD><TD class="docTableCell" align="left" valign="top"><p class="docText">791</p></TD></tr><tr><TD class="rightBorder" align="left" valign="top"><p class="docText">5</P></td><TD class="rightBorder" align="left" valign="top"><p class="docText">ST Datagram Mode</P></td><td class="docTableCell" align="left" valign="top"><p class="docText">1190</p></td></TR><tr><td class="rightBorder" align="left" valign="top"><p class="docText">6</P></td><td class="rightBorder" align="left" valign="top"><p class="docText">Simple Internet Protocol (SIP)</P></TD><TD class="docTableCell" align="left" valign="top">&nbsp;</td></tr><tr><td class="rightBorder" align="left" valign="top"><p class="docText">6</p></td><td class="rightBorder" align="left" valign="top"><p class="docText">Internet Protocol version 6 (IPv6)</p></td><td class="docTableCell" align="left" valign="top"><p class="docText">1883</p></td></tr><tr><td class="rightBorder" align="left" valign="top"><p class="docText">7</P></TD><td class="rightBorder" align="left" valign="top"><p class="docText">TP/IX</p></TD><td class="docTableCell" align="left" valign="top"><p class="docText">1475</P></td></tr><TR><TD class="rightBorder" align="left" valign="top"><p class="docText">8</p></TD><td class="rightBorder" align="left" valign="top"><p class="docText">P Internet Protocol (PIP)</p></TD><TD class="docTableCell" align="left" valign="top"><p class="docText">1621</p></TD></TR><tr><td class="rightBorder" align="left" valign="top"><p class="docText">9</p></td><TD class="rightBorder" align="left" valign="top"><p class="docText">TCP and UDP over Bigger Addresses (TUBA)</p></td><TD class="docTableCell" align="left" valign="top"><p class="docText">1347</p></td></TR><TR><TD class="rightBorder" align="left" valign="top"><p class="docText">1014</p></td><td class="rightBorder" align="left" valign="top"><p class="docText">Unassigned</p></td><td class="docTableCell" align="left" valign="top">&nbsp;</td></tr><tr><td class="rightBorder" align="left" valign="top"><p class="docText">15</p></td><td class="rightBorder" align="left" valign="top"><p class="docText">Reserved</p></td><TD class="docTableCell" align="left" valign="top">&nbsp;</TD></tr></table></p><BR>
+<p class="docText"><span class="docEmphasis">Header Length</span> is a four-bit field that tells, as the name implies, the length of the IP header in 32-bit words. This field is included because the Options field (described later in this section) can vary in size. The minimum length of the IP header is 20 octets, and the options might increase this size up to a maximum of 60 octetsthe maximum length in 32-bit words that can be described by this field.</p>
+<p class="docText"><span class="docEmphasis">Type of Service</span> (TOS) is an eight-bit field that can be used for specifying special handling of the packet. This field actually can be broken down into two subfields: Precedence and TOS. Precedence sets a priority for the packet, the way a package might be sent overnight, two-day delivery, or general post. TOS allows the selection of a delivery service in terms of throughput, delay, reliability, and monetary cost. Although this field is not commonly used (all the bits will usually be set to zero), early specifications of the Open Shortest Path First (OSPF) protocol called for TOS routing. Also, the Precedence bits are occasionally used in quality of service (QoS) applications. Part (a) of <a class="docLink" href="#ch01fig03">Figure 1-3</a> summarizes the eight TOS bits; for more information, see RFC 1340 and RFC 1349.</P>
+<a name="ch01fig03"></a><p><center>
+<h5 class="docFigureTitle">Figure 1-3. Type of Service (a) or DiffServ and ECN (b) field.</H5>
+<p class="docText"><div class="v1"><a target="_self" href="images/01fig03_alt.jpg">[View full size image]</a></div><img border="0" alt="" width="500" height="372" SRC="images/01fig03.jpg"></P>
+</center></p><BR>
+<p class="docText"><a name="idd1e1519"></a><a name="idd1e1523"></a><a name="idd1e1527"></a><a name="idd1e1531"></a>In recent years, the ToS field has been redefined as a part of the <span class="docEmphasis">Differentiated Services</span> (DiffServ) framework.<sup class="docFootnote"><a class="docLink" href="#ch01fn03">[3]</a></sup> This framework creates a much more flexible handling of IP packets than was allowed by the relatively rigid ToS definitions. With DiffServ, you can define service classes on a router and then sort packets into these classes. The router can then queue and forward packets with different levels of priority, according to their classification. Each queuing and forwarding treatment is called a <span class="docEmphasis">Per-Hop Behavior</span> (PHB). While DiffServ defines the framework or architecture, the mechanism itself is called Differentiated Class of Service or simply <span class="docEmphasis">Class of Service</span> (COS).</p><blockquote><p class="docFootnote"><sup><a name="ch01fn03">[3]</a></sup> K. Nichols, S. Blake, F. Baker, and D. Black, &quot;Definition of the Differentiated Services Field (DS Field) in the IPv4 and IPv6 Headers,&quot; RFC 2474, December 1998.</p></blockquote>
+<p class="docText">Part (b) of <a class="docLink" href="#ch01fig03">Figure 1-3</a> shows how the ToS field has been redefined, so that the first six bits now compose the <span class="docEmphasis">DiffServ Code Point</span> (DSCP). With these six bits you can define, either arbitrarily or according to service classes predefined in the DiffServ architecture, up to 64 different service classes that can then be sorted into PHBs. Note that the field in the IP header remains 8 bits; the DiffServ architecture just redefines how a router interprets the value in that field.</P>
+<p class="docText"><a name="idd1e1562"></a><a name="idd1e1566"></a><a name="idd1e1570"></a><a name="idd1e1574"></a><a name="idd1e1578"></a><a name="idd1e1582"></a><a name="idd1e1591"></a><a name="idd1e1600"></a><a name="idd1e1609"></a><a name="idd1e1615"></a><a name="idd1e1621"></a><a name="idd1e1627"></a><a name="idd1e1631"></a><a name="idd1e1637"></a><a name="idd1e1646"></a><a name="idd1e1655"></a><span class="docEmphasis">Explicit Congestion Notification</span> (ECN), in part (b) of <a class="docLink" href="#ch01fig03">Figure 1-3</a>, is used by some routers to signal support for Explicit Congestion Notification and, when it is supported, the bits can be used to signal congestion (ECN = 11).<sup class="docFootnote"><a class="docLink" href="#ch01fn04">[4]</a></sup></P><blockquote><p class="docFootnote"><sup><a name="ch01fn04">[4]</a></sup> K. Ramakrishnan, &quot;The Addition of Explicit Congestion Notification (ECN) to IP,&quot; RFC 3168, September 2001.</p></blockquote>
+<p class="docText"><span class="docEmphasis">Total Length</span> is a 16-bit field specifying the total length of the packet, including the header, in octets. By subtracting the header length, a receiver might determine the size of the packet's data payload. Because the largest decimal number that can be described with 16 bits is 65,535, the maximum possible size of an IP packet is 65,535 octets.</P>
+<p class="docText"><span class="docEmphasis">Identifier</span> is a 16-bit field used in conjunction with the <span class="docEmphasis">Flags</span> and <span class="docEmphasis">Fragment Offset</span> fields for fragmentation of a packet. Packets must be fragmented into smaller packets if the original length exceeds the Maximum Transmission Unit (MTU) of a data link through which they pass. For example, consider a 5000-byte packet traveling through a network. It encounters a data link with a 1500 byte MTU. That is, the frame can contain a maximum packet size of 1500 bytes. The router that places the packet onto this data link must first fragment the packet into chunks of no more than 1500 octets each. The router then marks each fragment with the same number in the Identifier field so that a receiving device can identify the fragments that go together.<sup class="docFootnote"><a class="docLink" href="#ch01fn05">[5]</a></sup></P><blockquote><p class="docFootnote"><sup><a name="ch01fn05">[5]</a></sup> A fragmented packet is not reassembled at the other end of the data link; the packet stays fragmented until it reaches its final destination.</p></blockquote>
+<p class="docText"><span class="docEmphasis">Flags</span> is a three-bit field in which the first bit is unused. The second is the Don't Fragment (DF) bit. When the DF bit is set to one, a router cannot fragment the packet. If the packet cannot be forwarded without fragmenting, the router drops the packet and sends an error message to the source. This function enables the testing of MTUs in a network. The DF bit can be set using the Extended Ping utility in IOS, as shown in <a class="docLink" href="#ch01ex01">Example 1-1</a>.</p>
+<a name="ch01ex01"></a>
+<h5 class="docExampleTitle">Example 1-1. The IOS Extended Ping utility allows the setting of the DF bit to test MTUs across a network. In this ping Output, the largest MTU of the path to destination 172.16.113.17 is 1478 octets.</h5>
+
+<pre>Handy#<span class="docEmphStrong">ping</span>
+Protocol [ip]:
+Target IP address: <span class="docEmphStrong">172.16.113.17</span>
+Repeat count [5]: <span class="docEmphStrong">1</span>
+Datagram size [100]:
+Timeout in seconds [2]:
+Extended commands [n]: <span class="docEmphStrong">y</span>
+Source address:
+Type of service [0]:
+Set DF bit in IP header? [no]: <span class="docEmphStrong">y</span>
+Validate reply data? [no]:
+Data pattern [0xABCD]:
+Loose, Strict, Record, Timestamp, Verbose[none]: <span class="docEmphStrong">r</span>
+Number of hops [9]:
+Loose, Strict, Record, Timestamp, Verbose[RV]:
+Sweep range of sizes [n]: <span class="docEmphStrong">y</span>
+Sweep min size [76]: <span class="docEmphStrong">500</span>
+Sweep max size [18024]: <span class="docEmphStrong">2000</span>
+Sweep interval [1]: <span class="docEmphStrong">500</span>
+Type escape sequence to abort.
+Sending 4, [500..2000]-byte ICMP Echos to 172.16.113.17, timeout is 2 seconds:
+Packet has IP options:  Total option bytes= 39, padded length=40
+ Record route: &lt;*&gt; 0.0.0.0 0.0.0.0 0.0.0.0 0.0.0.0
+         0.0.0.0 0.0.0.0 0.0.0.0 0.0.0.0 0.0.0.0
+
+Reply to request 0 (16 ms) (size 500).  Received packet has options
+ Total option bytes= 40, padded length=40
+ Record route: 172.16.192.5 172.16.113.18 172.16.113.17 172.16.113.17
+         172.16.192.6 172.16.192.5 &lt;*&gt; 0.0.0.0 0.0.0.0 0.0.0.0
+ End of list
+
+Reply to request 1 (24 ms) (size 1000).  Received packet has options
+ Total option bytes= 40, padded length=40
+ Record route: 172.16.192.5 172.16.113.18 172.16.113.17 172.16.113.17
+         172.16.192.6 172.16.192.5 &lt;*&gt; 0.0.0.0 0.0.0.0 0.0.0.0
+ End of list
+
+Reply to request 2 (28 ms) (size 1500).  Received packet has options
+ Total option bytes= 40, padded length=40
+ Record route: 172.16.192.5 172.16.113.18 172.16.113.17 172.16.113.17
+         172.16.192.6 172.16.192.5 &lt;*&gt; 0.0.0.0 0.0.0.0 0.0.0.0
+ End of list
+
+Unreachable from 172.16.192.6, maximum MTU 1478 (size 2000).
+ Received packet has options
+ Total option bytes= 39, padded length=40
+ Record route: &lt;*&gt; 0.0.0.0 0.0.0.0 0.0.0.0 0.0.0.0
+         0.0.0.0 0.0.0.0 0.0.0.0 0.0.0.0 0.0.0.0
+
+Success rate is 75 percent (3/4), round-trip min/avg/max = 16/22/28 ms
+Handy#</pre><BR>
+
+
+<p class="docText"><a name="idd1e1747"></a><a name="idd1e1751"></a><a name="idd1e1755"></a><a name="idd1e1764"></a><a name="idd1e1770"></a><a name="idd1e1774"></a><a name="idd1e1778"></a>The third bit is the More Fragments (MF) bit. When a router fragments a packet, it sets the MF bit to one in all but the last fragment so that the receiver knows to keep expecting fragments until it encounters a fragment with MF = 0.</p>
+<p class="docText"><span class="docEmphasis">Fragment Offset</span> is a 13-bit field that specifies the offset, in units of eight octets, from the beginning of the header to the beginning of the fragment.<sup class="docFootnote"><a class="docLink" href="#ch01fn06">[6]</a></sup> Because fragments might not <a name="idd1e1798"></a><a name="idd1e1804"></a><a name="idd1e1813"></a><a name="idd1e1819"></a><a name="idd1e1828"></a><a name="idd1e1832"></a>always arrive in sequence, the Fragment Offset field allows the pieces to be reassembled in the correct order.</p><blockquote><p class="docFootnote"><sup><a name="ch01fn06">[6]</a></sup> Units of eight octets are used so that a maximum-size packet of 65,535 bytes might be described with 13 bits.</P></blockquote>
+<p class="docText">Note that if a single fragment is lost during a transmission, the entire packet must be resent and refragmented at the same point in the network. Therefore, error-prone data links could cause a disproportionate delay. And if a fragment is lost because of congestion, the retransmission of the entire series of fragments might increase the congestion.</p>
+<p class="docText"><span class="docEmphasis">Time to Live</span> (TTL) is an eight-bit field that will be set with a certain number when the packet is first generated. As the packet is passed from router to router, each router will decrement this number. If the number reaches zero, the packet will be discarded and an error message will be sent to the source. This process prevents &quot;lost&quot; packets from wandering endlessly through a network.</p>
+<p class="docText">As originally conceived, the TTL was specified in seconds; if a packet was delayed more than a second in a router, the router would adjust the TTL accordingly. However, this approach is difficult to implement and has never been generally supported. Modern routers simply decrement the TTL by one, no matter what the actual delay, so the TTL is really a hop count.<sup class="docFootnote"><a class="docLink" href="#ch01fn07">[7]</a></sup> The recommended default TTL is 64, although values such as 15 and 32 are not uncommon.</P><blockquote><p class="docFootnote"><sup><a name="ch01fn07">[7]</a></sup> As you will read in <a class="docLink" href="ch02.html#ch02">Chapter 2</a>, the equivalent field in the IPv6 header has been renamed Hop Limit to more accurately reflect its true usage.</P></blockquote>
+<p class="docText">Some trace utilities, such as the IOS <span class="docEmphStrong">trace</span> command, make use of the TTL field. If the router is told to trace the route to a host address such as 10.11.12.13, the router will send three packets with the TTL set to one; the first router will decrement it to zero, drop the packets, and send back error messages to the source. By reading the source address of the error messages, the first router on the path is now known. The next three packets will be sent with a TTL of two. The first router decrements to one, the second to zero, and an error message is received from the second router. The third set has a TTL of three, and so forth, until the destination is found. All routers along the network path will have identified themselves. <a class="docLink" href="#ch01ex02">Example 1-2</a> shows the output from an IOS trace.</P>
+<a name="ch01ex02"></a>
+<h5 class="docExampleTitle">Example 1-2. The trace utility uses the TTL field to identify routers along a route. Asterisks indicate timed-out packets.</h5>
+
+<pre>Elvis#<span class="docEmphStrong">traceroute www.cisco.com</span>
+
+Type escape sequence to abort.
+Tracing the route to cio-sys.Cisco.COM (192.31.7.130)
+
+  1 172.18.197.17 4 msec   4 msec 4 msec
+  2 ltlrichard-s1-13.hwy51.com (172.18.197.1) 36 msec 44 msec  2536 msec
+  3 cperkins-rtr-fr2.hwy51.com (10.168.204.3) 104 msec 64 msec *
+  4 cberry.hwy51.com (10.168.193.1)  92 msec *
+  5 jllewis-inner.hwy51.com (10.168.207.59) 44 msec  *  44 msec
+  6 bholly-fw-outer-rt.hwy51.com (10.168.207.94) 44 msec *   48 msec
+  7 sl-stk-14-S10/0:6-512k.sprintlink.net (144.228.214.107) 92 msec *
+  8 sl-stk-2-F1/0/0.sprintlink.net  (144.228.40.2) 52 msec 1156 msec *
+  9 sl-mae-w-H1/0-T3.sprintlink.net  (144.228.10.46) 100 msec 124 msec 2340 msec
+ 10 sanjose1-br1.bbnplanet.net  (198.32.136.19) 2264 msec   164 msec *
+ 11 paloalto-br2.bbnplanet.net  (4.0.1.10) 64 msec 60 msec    *
+ 12 su-pr2.bbnplanet.net  (131.119.0.218) 76 msec 76 msec    76 msec
+ 13 cisco.bbnplanet.net  (131.119.26.10) 2560 msec 76 msec    936 msec
+ 14 sty.cisco.com  (192.31.7.39)  84 msec 72 msec  *
+ 15 cio-sys.Cisco.COM  (192.31.7.130) 60 msec  *   64 msec
+Elvis#</pre><br>
+
+
+<p class="docText"><a name="idd1e1884"></a><a name="idd1e1888"></a><a name="idd1e1892"></a><a name="idd1e1901"></a><a name="idd1e1905"></a><a name="idd1e1911"></a><a name="idd1e1917"></a><a name="idd1e1926"></a><a name="idd1e1935"></a><span class="docEmphasis">Protocol</span> is an eight-bit field that gives the &quot;address,&quot; or protocol number, of the host-to-host or transport layer protocol for which the information in the packet is destined. <a class="docLink" href="#ch01table02">Table 1-2</a> shows a few of the more common of the 100 or so different protocol numbers currently assigned.</p>
+<a name="ch01table02"></a><p><table cellspacing="0" class="allBorders" border="1" RULES="groups" cellpadding="5"><caption><h5 class="docTableTitle">Table 1-2. A few well-known protocol numbers.</h5></caption><colgroup><col width="200"><col width="300"></colgroup><thead><tr><th class="rightBorder bottomBorder thead" scope="col" align="left" valign="top"><p class="docText">Protocol Number</p></th><th class="bottomBorder thead" scope="col" align="left" valign="top"><p class="docText">Host-to-Host Layer Protocol</p></th></tr></thead><tr><td class="rightBorder" align="left" valign="top"><p class="docText">1</p></td><TD class="docTableCell" align="left" valign="top"><p class="docText">Internet Control Message Protocol (ICMP)</P></td></tr><TR><td class="rightBorder" align="left" valign="top"><p class="docText">2</P></td><td class="docTableCell" align="left" valign="top"><p class="docText">Internet Group Management Protocol (IGMP)</P></TD></tr><TR><td class="rightBorder" align="left" valign="top"><p class="docText">4</p></TD><TD class="docTableCell" align="left" valign="top"><p class="docText">IP in IP (encapsulation)</p></TD></TR><tr><td class="rightBorder" align="left" valign="top"><p class="docText">6</p></td><TD class="docTableCell" align="left" valign="top"><p class="docText">Transmission Control Protocol (TCP)</p></td></TR><tr><td class="rightBorder" align="left" valign="top"><p class="docText">17</P></TD><TD class="docTableCell" align="left" valign="top"><p class="docText">User Datagram Protocol (UDP)</p></td></tr><tr><td class="rightBorder bottomBorder" align="left" valign="top"><p class="docText">45</p></td><td class="bottomBorder" align="left" valign="top"><p class="docText">Inter-Domain Routing Protocol (IDRP)</p></td></tr><tr><td class="rightBorder" align="left" valign="top"><p class="docText">46</p></td><TD class="docTableCell" align="left" valign="top"><p class="docText">Resource Reservation Protocol (RSVP)</P></td></tr><TR><td class="rightBorder" align="left" valign="top"><p class="docText">47</P></td><td class="docTableCell" align="left" valign="top"><p class="docText">Generic Routing Encapsulation (GRE)</P></TD></tr><TR><td class="rightBorder" align="left" valign="top"><p class="docText">54</p></TD><TD class="docTableCell" align="left" valign="top"><p class="docText">NBMA Next Hop Resolution Protocol (NHRP)</p></TD></TR><tr><td class="rightBorder" align="left" valign="top"><p class="docText">88</p></td><TD class="docTableCell" align="left" valign="top"><p class="docText">Cisco Internet Gateway Routing Protocol (IGRP)</p></td></TR><tr><td class="rightBorder" align="left" valign="top"><p class="docText">89</P></TD><TD class="docTableCell" align="left" valign="top"><p class="docText">Open Shortest Path First (OSPF)</p></td></tr></table></p><br>
+<p class="docText"><span class="docEmphasis">Header Checksum</span> is the error detection field for the IP header. The checksum is not calculated for the encapsulated data; UDP, TCP, and ICMP have their own checksums for doing this. The field contains a 16-bit one's complement checksum, calculated by the originator of the packet. The receiver will again calculate a 16-bit one's complement sum, including the original checksum. If no errors have occurred during the packet's travels, the resulting checksum will be all ones. Remember that each router decrements the TTL; therefore, the checksum must be recalculated at each router. RFC 1141 discusses some strategies for simplifying this calculation.</p>
+<p class="docText"><a name="idd1e2107"></a><a name="idd1e2116"></a><a name="idd1e2125"></a><a name="idd1e2131"></a><a name="idd1e2137"></a><span class="docEmphasis">Source</span> and <span class="docEmphasis">Destination Addresses</span> are the 32-bit IP addresses of the originator of the packet and the destination of the packet. The format of IP addresses is covered in the next section, &quot;<a class="docLink" href="ch01lev1sec3.html#ch01lev1sec3">IPv4 Addresses</a>.&quot;</p>
+<p class="docText"><span class="docEmphasis">Options</span> is a variable-length field and, as the name says, is optional. Space is added to the packet header to contain either source-generated information or for other routers to enter information; the options are used primarily for testing. The most frequently used options are</p>
+<ul><li><p class="docList"><span class="docEmphasis">Loose source routing</span>, in which a series of IP addresses for router interfaces is listed. The packet must pass through each of these addresses, although multiple hops might be taken between the addresses.</p></li><li><p class="docList"><span class="docEmphasis">Strict source routing</span>, where again a series of router addresses is listed. Unlike loose source routing, the packet must follow the route exactly. If the next hop is not the next address on the list, an error occurs.</p></li><LI><p class="docList"><span class="docEmphasis">Record route</span> provides room for each router to enter the address of its outgoing interface as the packet transits so that a record is kept of all routers the packet encounters. Record route provides a function similar to <span class="docEmphasis">trace</span> except that the outgoing interfaces, both on the path to the destination and on the return path, are recorded.</P></li><li><p class="docList"><span class="docEmphasis">Timestamp</span> is an option similar to record route except each router also enters a timestamp: the packet not only keeps track of where it has been but also records when it was there.</P></li></UL>
+<p class="docText">All these options might be invoked by using the Extended Ping on Cisco routers. Record route is used in <a class="docLink" href="#ch01ex01">Example 1-1</a>, loose source routing and timestamp are used in <a class="docLink" href="#ch01ex03">Example 1-3</a>, and strict source routing is used in <a class="docLink" href="#ch01ex04">Example 1-4</a>.</p>
+<a name="ch01ex03"></a>
+<h5 class="docExampleTitle">Example 1-3. The Cisco Extended Ping can be used to set parameters in the Options field of the IP header. In this example, loose source routing and timestamp are used.</H5>
+
+<pre>Handy#<span class="docEmphStrong">ping</span>
+Protocol [ip]:
+Target IP address: <span class="docEmphStrong">172.16.113.9</span>
+Repeat count [5]:
+Datagram size [100]:
+Timeout in seconds [2]:
+Extended commands [n]: <span class="docEmphStrong">y</span>
+Source address:
+Type of service [0]:
+Set DF bit in IP header? [no]:
+Validate reply data? [no]:
+Data pattern [0xABCD]:
+Loose, Strict, Record, Timestamp, Verbose[none]: <span class="docEmphStrong">l</span>
+Source route: <span class="docEmphStrong">172.16.113.14 172.16.113.10</span>
+Loose, Strict, Record, Timestamp, Verbose[LV]: <span class="docEmphStrong">t</span>
+Number of timestamps [ 6 ]: <span class="docEmphStrong">2</span>
+Loose, Strict, Record, Timestamp, Verbose[LTV]:
+Sweep range of sizes [n]:
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 172.16.113.9, timeout is 2 seconds:
+Packet has IP options: Total option bytes= 23, padded length=24
+  Loose source route: &lt;*&gt; 172.16.113.14 172.16.113.10
+  Timestamp: Type 0. Overflows: 0 length 12, ptr 5
+    &gt;&gt;Current pointer&lt;&lt;
+    Time= 0
+    Time= 0
+
+Request 0 timed out
+Reply to request 1 (76 ms). Received packet has options
+  Total option bytes= 24, padded length=24
+  Loose source route: 172.16.113.13 172.16.192.6 &lt;*&gt;
+  Timestamp: Type 0. Overflows: 6 length 12, ptr 13
+    Time= 80FF4798
+    Time= 80FF4750
+    &gt;&gt;Current pointer&lt;&lt;
+  End of list
+
+Request 2 timed out
+Reply to request 3 (76 ms). Received packet has options
+  Total option bytes= 24, padded length=24
+  Loose source route: 172.16.113.13 172.16.192.6 &lt;*&gt;
+  Timestamp: Type 0. Overflows: 6 length 12, ptr 13
+  Time= 80FF4FC0
+  Time= 80FF4F78
+  &gt;&gt;Current pointer&lt;&lt;
+End of list
+
+Request 4 timed out
+Success rate is 40 percent (2/5), round-trip min/avg/max = 76/76/76 ms
+Handy#</pre><BR>
+
+
+<a name="ch01ex04"></a>
+<h5 class="docExampleTitle">Example 1-4. Extended Ping is used here to set strict source routing in the ping packets.</H5>
+
+<pre>Handy#<span class="docEmphStrong">ping</span>
+Protocol [ip]:
+Target IP address: <span class="docEmphStrong">172.16.113.10</span>
+Repeat count [5]: <span class="docEmphStrong">2</span>
+Datagram size [100]:
+Timeout in seconds [2]:
+Extended commands [n]: <span class="docEmphStrong">y</span>
+Source address:
+Type of service [0]:
+Set DF bit in IP header? [no]:
+Validate reply data? [no]:
+Data pattern [0xABCD]:
+Loose, Strict, Record, Timestamp, Verbose[none]: <span class="docEmphStrong">s</span>
+Source route: <span class="docEmphStrong">172.16.192.6 172.16.113.17 172.16.113.10</span>
+Loose, Strict, Record, Timestamp, Verbose[SV]:
+Sweep range of sizes [n]:
+Type escape sequence to abort.
+Sending 2, 100-byte ICMP Echos to 172.16.113.10, timeout is 2 seconds:
+Packet has IP options: Total option bytes= 15, padded length=16
+  Strict source route: &lt;*&gt; 172.16.192.6 172.16.113.17 172.16.113.10
+
+Reply to request 0 (80 ms). Received packet has options
+  Total option bytes= 16, padded length=16
+  Strict source route: 172.16.113.10 172.16.113.17 172.16.192.6 &lt;*&gt;
+  End of list
+
+Reply to request 1 (76 ms). Received packet has options
+  Total option bytes= 16, padded length=16
+  Strict source route: 172.16.113.10 172.16.113.17 172.16.192.6 &lt;*&gt;
+  End of list
+
+Success rate is 100 percent (2/2), round-trip min/avg/max = 76/78/80 ms
+Handy#</pre><br>
+
+
+<p class="docText"><a name="idd1e2276"></a><a name="idd1e2280"></a><a name="idd1e2286"></a><span class="docEmphasis">Padding</span> ensures that the header ends on a 32-bit boundary by adding zeros after the option field until a multiple of 32 is reached.</p>
+<p class="docText">A protocol analyzer capture of an IP header is shown in <a class="docLink" href="#ch01ex05">Example 1-5</a>. Compare the information shown with <a class="docLink" href="#ch01fig02">Figure 1-2</a>.</P>
+<a name="ch01ex05"></a>
+<H5 class="docExampleTitle">Example 1-5. You can see the fields of an IP packet's header and the values contained in each field in this protocol analyzer display.</h5>
+
+<pre>Internet Protocol, Src Addr: 172.16.1.102 (172.16.1.102), Dst Addr: 224.0.0.5
+(224.0.0.5)
+    Version: 4
+    Header length: 20 bytes
+    Differentiated Services Field: 0xc0 (DSCP 0x30: Class Selector 6; ECN: 0x00)
+    Total Length: 64
+    Identification: 0x6e61 (28257)
+    Flags: 0x00
+    Fragment offset: 0
+    Time to live: 1
+    Protocol: OSPF IGP (0x59)
+    Header checksum: 0xbcc8 (correct)
+    Source: 172.16.1.102 (172.16.1.102)
+    Destination: 224.0.0.5 (224.0.0.5)</pre><BR>
+
+
+
+<a href="4051535.html"><img src="images/pixel.jpg" alt="" width="1" height="1" border="0"></a></TD></TR></table>
+<br>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+<tr><td><div STYLE="MARGIN-LEFT: 0.15in;">
+<a href=ch01lev1sec1.html><img src="images/prev.gif" width="60" height="17" border="0" align="absmiddle" alt="Previous Page"></a>
+<td align="right"><div STYLE="MARGIN-LEFT: 0.15in;">
+<a href=ch01lev1sec3.html><img src="images/next.gif" width="60" height="17" border="0" align="absmiddle" alt="Next Page"></a>
+</div></td></tr></table>
+<script src="http://www.fengnet.com/count/mystat.asp"></script>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-279487-1";
+urchinTracker();
+</script><script src="http://www.fengnet.com/count/mystat.asp"></script>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-279487-1";
+urchinTracker();
+</script></body></html>
+

@@ -1,0 +1,85 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "storage_mgr.h"
+#include "dberror.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <unistd.h>
+
+struct SM_FileHandle *sm_FileHandle_mgr;
+
+FILE *file;
+
+/* manipulating page files */
+void initStorageManager (void){
+	printf("initStorageManager invoked !!\n");
+}
+
+RC createPageFile (char *fileName){
+	//Creating a file
+	printf("Create file invoked; Filename : %s!!\n",fileName);
+	return 1;
+}
+
+RC openPageFile (char *fileName, SM_FileHandle *fHandle){
+	printf("openPageFile invoked !!\n");
+	return 1;
+}
+RC closePageFile (SM_FileHandle *fHandle){
+	printf("closePageFile invoked !!\n");
+	return 1;
+}
+RC destroyPageFile (char *fileName){
+	printf("destroyPageFile invoked !!\n");
+	return 1;
+}
+
+
+/* reading blocks from disc */
+RC readBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage){
+	printf("readBlock invoked !!\n");
+	return 1;
+}
+int getBlockPos (SM_FileHandle *fHandle){
+	printf("getBlockPos invoked !!\n");
+}
+RC readFirstBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){
+	printf("readFirstBlock invoked !!\n");
+	return 1;
+}
+RC readPreviousBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){
+	printf("readPreviousBlock invoked !!\n");
+	return 1;
+}
+RC readCurrentBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){
+	printf("readCurrentBlock invoked !!\n");
+	return 1;
+}
+RC readNextBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){
+	printf("readNextBlock invoked !!\n");
+	return 1;
+}
+RC readLastBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){
+	printf("readLastBlock invoked !!\n");
+	return 1;
+}
+
+
+/* writing blocks to a page file */
+RC writeBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage){
+	printf("writeBlock invoked !!\n");
+	return 1;
+}
+RC writeCurrentBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){
+	printf("writeCurrentBlock invoked !!\n");
+	return 1;
+}
+RC appendEmptyBlock (SM_FileHandle *fHandle){
+	printf("appendEmptyBlock invoked !!\n");
+	return 1;
+}
+RC ensureCapacity (int numberOfPages, SM_FileHandle *fHandle){
+	printf("ensureCapacity invoked !!\n");
+	return 1;
+}
